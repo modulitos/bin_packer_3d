@@ -1,8 +1,9 @@
 use crate::cuboid::FirstFitKind::{DoubledFit, ExactFit, GreaterThanFit};
 use crate::error::Result;
+use std::cmp::Ordering::Equal;
 
-type Dimension = u8;
-type Volume = u32;
+type Dimension = f32;
+type Volume = f32;
 
 enum FirstFitKind {
     // usize contains the index of the dim that matches the first fit
@@ -11,7 +12,7 @@ enum FirstFitKind {
     GreaterThanFit(usize),
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, PartialEq)]
 pub struct Box {
     dims: [Dimension; 3],
 }
@@ -19,7 +20,7 @@ pub struct Box {
 impl Box {
     fn new(d1: Dimension, d2: Dimension, d3: Dimension) -> Self {
         let mut dims = [d1, d2, d3];
-        dims.sort();
+        dims.sort_by(|a, b| a.partial_cmp(b).unwrap_or(Equal));
         Self { dims }
     }
 
@@ -55,7 +56,7 @@ impl Box {
 
     fn _get_first_fit(&self, item: &Box) -> FirstFitKind {
         let doubled_fit_side = self.dims.iter().enumerate().find_map(|(i, side)| {
-            if side >= &(item.dims[2] * 2) {
+            if side >= &(item.dims[2] * 2 as Dimension) {
                 Some(i)
             } else {
                 None
@@ -192,45 +193,50 @@ impl Box {
 
         let mut res = blocks
             .into_iter()
-            .filter(|block| block.dims[0] != 0)
+            .filter(|block| block.dims[0] > 0 as Dimension)
             .collect::<Vec<Box>>();
-        res.sort_by_key(|block| block.volume());
+        res.sort_by(|block_a, block_b| {
+            block_a
+                .volume()
+                .partial_cmp(&block_b.volume())
+                .unwrap_or(Equal)
+        });
         Some(res)
     }
 }
 
 #[test]
 fn test_box_creation() -> Result<()> {
-    Box::new(1, 2, 3);
+    Box::new(1 as Dimension, 2 as Dimension, 3 as Dimension);
     Ok(())
 }
 
 #[test]
 fn test_box_creation_sorts() -> Result<()> {
-    let b = Box::new(2, 1, 3);
-    assert_eq!(b.dims, [1, 2, 3]);
+    let b = Box::new(2 as Dimension, 1 as Dimension, 3 as Dimension);
+    assert_eq!(b.dims, [1 as Dimension, 2 as Dimension, 3 as Dimension]);
     Ok(())
 }
 
 #[test]
 fn test_box_volume() -> Result<()> {
-    let b = Box::new(3, 4, 5);
-    assert_eq!(b.volume(), 60);
+    let b = Box::new(3 as Dimension, 4 as Dimension, 5 as Dimension);
+    assert_eq!(b.volume(), 60 as Dimension);
     Ok(())
 }
 
 #[test]
 fn test_box_volume_large_values() -> Result<()> {
-    let b = Box::new(200, 100, 200);
-    assert_eq!(b.volume(), 4_000_000);
+    let b = Box::new(200 as Dimension, 100 as Dimension, 200 as Dimension);
+    assert_eq!(b.volume(), 4_000_000 as Dimension);
     Ok(())
 }
 
 #[test]
 fn test_box_does_it_fit() -> Result<()> {
     // test that when an item fits, it returns true
-    let item = Box::new(4, 12, 14);
-    let container = Box::new(4, 22, 14);
+    let item = Box::new(3.5, 12.7, 14 as Dimension);
+    let container = Box::new(4 as Dimension, 22 as Dimension, 14 as Dimension);
     assert!(container.does_it_fit(&item));
     Ok(())
 }
@@ -238,8 +244,8 @@ fn test_box_does_it_fit() -> Result<()> {
 #[test]
 fn test_box_does_it_fit_false() -> Result<()> {
     // test that when a item does not fit, it returns false
-    let item = Box::new(4, 12, 14);
-    let container = Box::new(3, 14, 14);
+    let item = Box::new(4 as Dimension, 12 as Dimension, 14 as Dimension);
+    let container = Box::new(3 as Dimension, 14 as Dimension, 14 as Dimension);
     assert!(!container.does_it_fit(&item));
     Ok(())
 }
@@ -248,8 +254,8 @@ fn test_box_does_it_fit_false() -> Result<()> {
 fn test_best_fit_nil() -> Result<()> {
     // assert that if a item does not fit in the container,
     // we get None returned
-    let item = Box::new(4, 12, 14);
-    let container = Box::new(3, 14, 14);
+    let item = Box::new(4 as Dimension, 12 as Dimension, 14 as Dimension);
+    let container = Box::new(3 as Dimension, 14 as Dimension, 14 as Dimension);
     assert_eq!(container.best_fit(&item), None);
     Ok(())
 }
@@ -259,8 +265,8 @@ fn test_best_fit_exact_size() -> Result<()> {
     // assert that if a item is the same size as the container, the remaining_dimensions comes back
     // empty
 
-    let item = Box::new(13, 13, 31);
-    let container = Box::new(13, 13, 31);
+    let item = Box::new(13 as Dimension, 13 as Dimension, 31 as Dimension);
+    let container = Box::new(13 as Dimension, 13 as Dimension, 31 as Dimension);
     assert_eq!(container.best_fit(&item), Some(vec![]));
     Ok(())
 }
@@ -270,31 +276,47 @@ fn test_best_fit_half_size() -> Result<()> {
     // Assert that if a item is smaller than the container, but has two dimensions the same, it will
     // return the empty space
 
-    let item = Box::new(13, 13, 31);
-    let container = Box::new(13, 26, 31);
-    assert_eq!(container.best_fit(&item), Some(vec![Box::new(13, 13, 31)]));
+    let item = Box::new(13 as Dimension, 13 as Dimension, 31 as Dimension);
+    let container = Box::new(13 as Dimension, 26 as Dimension, 31 as Dimension);
+    assert_eq!(
+        container.best_fit(&item),
+        Some(vec![Box::new(
+            13 as Dimension,
+            13 as Dimension,
+            31 as Dimension
+        )])
+    );
     Ok(())
 }
 
-// TODO: extend our Box work for floats as well.
-// #[test]
-// fn test_best_fit_first_fit_greater_than() -> Result<()> {
-// # test that the "greater than" match clause of the first fit returns the
-// # correct remaining space.
-// item = Box.new(1.25, 7, 10)
-// container = Box.new(3.5, 9.5, 12.5)
-//     assert_eq!(container.best_fit(&item), Some(vec![Box::new(13, 13, 31)]));
-//     Ok(())
-// }
+#[test]
+fn test_best_fit_first_fit_greater_than() -> Result<()> {
+    // test that the "greater than" match clause of the first fit returns the
+    // correct remaining space.
+    let item = Box::new(1.25, 7 as Dimension, 10 as Dimension);
+    let container = Box::new(3.5, 9.5, 12.5);
+    assert_eq!(
+        container.best_fit(&item),
+        Some(vec![
+            Box::new(1.25, 2.5, 7 as Dimension),
+            Box::new(2.5, 3.5, 12.5),
+            Box::new(2.25, 7 as Dimension, 12.5)
+        ])
+    );
+    Ok(())
+}
 
 #[test]
 fn test_best_fit_multiple_spaces_1_2_2() -> Result<()> {
     // test to ensure that our 2x theorum is working
-    let item = Box::new(1, 1, 1);
-    let container = Box::new(1, 2, 2);
+    let item = Box::new(1 as Dimension, 1 as Dimension, 1 as Dimension);
+    let container = Box::new(1 as Dimension, 2 as Dimension, 2 as Dimension);
     assert_eq!(
         container.best_fit(&item),
-        Some(vec![Box::new(1, 1, 1), Box::new(1, 1, 2)])
+        Some(vec![
+            Box::new(1 as Dimension, 1 as Dimension, 1 as Dimension),
+            Box::new(1 as Dimension, 1 as Dimension, 2 as Dimension)
+        ])
     );
     Ok(())
 }
@@ -303,11 +325,15 @@ fn test_best_fit_multiple_spaces_1_2_2() -> Result<()> {
 fn test_best_fit_multiple_spaces() -> Result<()> {
     // assert that if a item is smaller than the container, but has two dimensions
     // the same, it will return the empty space
-    let item = Box::new(13, 13, 31);
-    let container = Box::new(20, 20, 31);
+    let item = Box::new(13 as Dimension, 13 as Dimension, 31 as Dimension);
+    let (x, y, z) = (20 as Dimension, 20 as Dimension, 31 as Dimension);
+    let container = Box::new(x, y, z);
     assert_eq!(
         container.best_fit(&item),
-        Some(vec![Box::new(7, 13, 31), Box::new(7, 20, 31)])
+        Some(vec![
+            Box::new(7 as Dimension, 13 as Dimension, 31 as Dimension),
+            Box::new(7 as Dimension, 20 as Dimension, 31 as Dimension)
+        ])
     );
     Ok(())
 }
