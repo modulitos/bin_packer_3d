@@ -1,4 +1,4 @@
-use crate::cuboid::FirstFitKind::{DoubledFit, ExactFit, GreaterThanFit};
+use crate::block::FirstFitKind::{DoubledFit, ExactFit, GreaterThanFit};
 use crate::error::Result;
 use std::cmp::Ordering::Equal;
 
@@ -13,11 +13,11 @@ enum FirstFitKind {
 }
 
 #[derive(Debug, PartialEq)]
-pub struct Box {
+pub struct Block {
     dims: [Dimension; 3],
 }
 
-impl Box {
+impl Block {
     fn new(d1: Dimension, d2: Dimension, d3: Dimension) -> Self {
         let mut dims = [d1, d2, d3];
         dims.sort_by(|a, b| a.partial_cmp(b).unwrap_or(Equal));
@@ -30,7 +30,7 @@ impl Box {
 
     // Returns a boolean regarding whether or not an item will fit into the box.
 
-    fn does_it_fit(&self, other: &Box) -> bool {
+    fn does_it_fit(&self, other: &Block) -> bool {
         self.dims
             .iter()
             .zip(other.dims.iter())
@@ -41,7 +41,7 @@ impl Box {
     // MUST be rotated in a specific direction based on size constraints, then
     // rotates it so it leaves the largest bulk volume left in the box
 
-    fn _get_side_2_side_3(&self, item: &Box, side_1: usize) -> (usize, usize) {
+    fn _get_side_2_side_3(&self, item: &Block, side_1: usize) -> (usize, usize) {
         if item.dims[1] > self.dims[(side_1 + 2) % 3] {
             (side_1 - 2, side_1 - 1)
         } else if item.dims[1] > self.dims[(side_1 + 1) % 3] {
@@ -54,7 +54,7 @@ impl Box {
     // Find the first fit where the longest side of our item fits into the
     // shortest side of our container.
 
-    fn _get_first_fit(&self, item: &Box) -> FirstFitKind {
+    fn _get_first_fit(&self, item: &Block) -> FirstFitKind {
         let doubled_fit_side = self.dims.iter().enumerate().find_map(|(i, side)| {
             if side >= &(item.dims[2] * 2 as Dimension) {
                 Some(i)
@@ -103,7 +103,7 @@ impl Box {
     //   >>> Box::new(10,10,10).best_fit(Box::new(5,5,5))
     //       [ Box<5,5,5>, Box<5,5,10>, Box<5,10,10> ]
 
-    pub fn best_fit(mut self, item: &Box) -> Option<Vec<Box>> {
+    pub fn best_fit(mut self, item: &Block) -> Option<Vec<Block>> {
         if !self.does_it_fit(&item) {
             return None;
         }
@@ -116,7 +116,7 @@ impl Box {
                 // side based on theory of if b_dim / 2 >= s_dim, don't open a new bin (or don't
                 // rotate the box).
 
-                let block_1 = Box::new(
+                let block_1 = Block::new(
                     self.dims[i] - item.dims[2],
                     self.dims[(i + 2) % 3],
                     self.dims[(i + 1) % 3],
@@ -127,7 +127,6 @@ impl Box {
                 self.dims[i] = item.dims[2];
 
                 blocks.push(block_1);
-                // (i, Some(block_1))
                 i
             }
             ExactFit(i) => {
@@ -140,7 +139,7 @@ impl Box {
                 //  If we can't do either of the above, then chose the shortest side of the
                 //  container where we can stack the longest side of the item:
 
-                blocks.push(Box::new(
+                blocks.push(Block::new(
                     self.dims[i] - item.dims[2],
                     item.dims[0],
                     item.dims[1],
@@ -152,24 +151,24 @@ impl Box {
         let (side_2, side_3) = self._get_side_2_side_3(item, side_1);
 
         // option one for remaining blocks
-        let block_2a = Box::new(
+        let block_2a = Block::new(
             self.dims[side_1],
             self.dims[side_2],
             self.dims[side_3] - item.dims[0],
         );
-        let block_3a = Box::new(
+        let block_3a = Block::new(
             self.dims[side_1],
             self.dims[side_2] - item.dims[1],
             item.dims[0],
         );
 
         // option two for remaining blocks
-        let block_2b = Box::new(
+        let block_2b = Block::new(
             self.dims[side_1],
             self.dims[side_2] - item.dims[1],
             self.dims[side_3],
         );
-        let block_3b = Box::new(
+        let block_3b = Block::new(
             self.dims[side_1],
             self.dims[side_3] - item.dims[0],
             item.dims[1],
@@ -194,7 +193,7 @@ impl Box {
         let mut res = blocks
             .into_iter()
             .filter(|block| block.dims[0] > 0 as Dimension)
-            .collect::<Vec<Box>>();
+            .collect::<Vec<Block>>();
         res.sort_by(|block_a, block_b| {
             block_a
                 .volume()
@@ -207,27 +206,27 @@ impl Box {
 
 #[test]
 fn test_box_creation() -> Result<()> {
-    Box::new(1 as Dimension, 2 as Dimension, 3 as Dimension);
+    Block::new(1 as Dimension, 2 as Dimension, 3 as Dimension);
     Ok(())
 }
 
 #[test]
 fn test_box_creation_sorts() -> Result<()> {
-    let b = Box::new(2 as Dimension, 1 as Dimension, 3 as Dimension);
+    let b = Block::new(2 as Dimension, 1 as Dimension, 3 as Dimension);
     assert_eq!(b.dims, [1 as Dimension, 2 as Dimension, 3 as Dimension]);
     Ok(())
 }
 
 #[test]
 fn test_box_volume() -> Result<()> {
-    let b = Box::new(3 as Dimension, 4 as Dimension, 5 as Dimension);
+    let b = Block::new(3 as Dimension, 4 as Dimension, 5 as Dimension);
     assert_eq!(b.volume(), 60 as Dimension);
     Ok(())
 }
 
 #[test]
 fn test_box_volume_large_values() -> Result<()> {
-    let b = Box::new(200 as Dimension, 100 as Dimension, 200 as Dimension);
+    let b = Block::new(200 as Dimension, 100 as Dimension, 200 as Dimension);
     assert_eq!(b.volume(), 4_000_000 as Dimension);
     Ok(())
 }
@@ -235,8 +234,8 @@ fn test_box_volume_large_values() -> Result<()> {
 #[test]
 fn test_box_does_it_fit() -> Result<()> {
     // test that when an item fits, it returns true
-    let item = Box::new(3.5, 12.7, 14 as Dimension);
-    let container = Box::new(4 as Dimension, 22 as Dimension, 14 as Dimension);
+    let item = Block::new(3.5, 12.7, 14 as Dimension);
+    let container = Block::new(4 as Dimension, 22 as Dimension, 14 as Dimension);
     assert!(container.does_it_fit(&item));
     Ok(())
 }
@@ -244,8 +243,8 @@ fn test_box_does_it_fit() -> Result<()> {
 #[test]
 fn test_box_does_it_fit_false() -> Result<()> {
     // test that when a item does not fit, it returns false
-    let item = Box::new(4 as Dimension, 12 as Dimension, 14 as Dimension);
-    let container = Box::new(3 as Dimension, 14 as Dimension, 14 as Dimension);
+    let item = Block::new(4 as Dimension, 12 as Dimension, 14 as Dimension);
+    let container = Block::new(3 as Dimension, 14 as Dimension, 14 as Dimension);
     assert!(!container.does_it_fit(&item));
     Ok(())
 }
@@ -254,8 +253,8 @@ fn test_box_does_it_fit_false() -> Result<()> {
 fn test_best_fit_nil() -> Result<()> {
     // assert that if a item does not fit in the container,
     // we get None returned
-    let item = Box::new(4 as Dimension, 12 as Dimension, 14 as Dimension);
-    let container = Box::new(3 as Dimension, 14 as Dimension, 14 as Dimension);
+    let item = Block::new(4 as Dimension, 12 as Dimension, 14 as Dimension);
+    let container = Block::new(3 as Dimension, 14 as Dimension, 14 as Dimension);
     assert_eq!(container.best_fit(&item), None);
     Ok(())
 }
@@ -265,8 +264,8 @@ fn test_best_fit_exact_size() -> Result<()> {
     // assert that if a item is the same size as the container, the remaining_dimensions comes back
     // empty
 
-    let item = Box::new(13 as Dimension, 13 as Dimension, 31 as Dimension);
-    let container = Box::new(13 as Dimension, 13 as Dimension, 31 as Dimension);
+    let item = Block::new(13 as Dimension, 13 as Dimension, 31 as Dimension);
+    let container = Block::new(13 as Dimension, 13 as Dimension, 31 as Dimension);
     assert_eq!(container.best_fit(&item), Some(vec![]));
     Ok(())
 }
@@ -276,11 +275,11 @@ fn test_best_fit_half_size() -> Result<()> {
     // Assert that if a item is smaller than the container, but has two dimensions the same, it will
     // return the empty space
 
-    let item = Box::new(13 as Dimension, 13 as Dimension, 31 as Dimension);
-    let container = Box::new(13 as Dimension, 26 as Dimension, 31 as Dimension);
+    let item = Block::new(13 as Dimension, 13 as Dimension, 31 as Dimension);
+    let container = Block::new(13 as Dimension, 26 as Dimension, 31 as Dimension);
     assert_eq!(
         container.best_fit(&item),
-        Some(vec![Box::new(
+        Some(vec![Block::new(
             13 as Dimension,
             13 as Dimension,
             31 as Dimension
@@ -293,14 +292,14 @@ fn test_best_fit_half_size() -> Result<()> {
 fn test_best_fit_first_fit_greater_than() -> Result<()> {
     // test that the "greater than" match clause of the first fit returns the
     // correct remaining space.
-    let item = Box::new(1.25, 7 as Dimension, 10 as Dimension);
-    let container = Box::new(3.5, 9.5, 12.5);
+    let item = Block::new(1.25, 7 as Dimension, 10 as Dimension);
+    let container = Block::new(3.5, 9.5, 12.5);
     assert_eq!(
         container.best_fit(&item),
         Some(vec![
-            Box::new(1.25, 2.5, 7 as Dimension),
-            Box::new(2.5, 3.5, 12.5),
-            Box::new(2.25, 7 as Dimension, 12.5)
+            Block::new(1.25, 2.5, 7 as Dimension),
+            Block::new(2.5, 3.5, 12.5),
+            Block::new(2.25, 7 as Dimension, 12.5)
         ])
     );
     Ok(())
@@ -309,13 +308,13 @@ fn test_best_fit_first_fit_greater_than() -> Result<()> {
 #[test]
 fn test_best_fit_multiple_spaces_1_2_2() -> Result<()> {
     // test to ensure that our 2x theorum is working
-    let item = Box::new(1 as Dimension, 1 as Dimension, 1 as Dimension);
-    let container = Box::new(1 as Dimension, 2 as Dimension, 2 as Dimension);
+    let item = Block::new(1 as Dimension, 1 as Dimension, 1 as Dimension);
+    let container = Block::new(1 as Dimension, 2 as Dimension, 2 as Dimension);
     assert_eq!(
         container.best_fit(&item),
         Some(vec![
-            Box::new(1 as Dimension, 1 as Dimension, 1 as Dimension),
-            Box::new(1 as Dimension, 1 as Dimension, 2 as Dimension)
+            Block::new(1 as Dimension, 1 as Dimension, 1 as Dimension),
+            Block::new(1 as Dimension, 1 as Dimension, 2 as Dimension)
         ])
     );
     Ok(())
@@ -325,14 +324,14 @@ fn test_best_fit_multiple_spaces_1_2_2() -> Result<()> {
 fn test_best_fit_multiple_spaces() -> Result<()> {
     // assert that if a item is smaller than the container, but has two dimensions
     // the same, it will return the empty space
-    let item = Box::new(13 as Dimension, 13 as Dimension, 31 as Dimension);
+    let item = Block::new(13 as Dimension, 13 as Dimension, 31 as Dimension);
     let (x, y, z) = (20 as Dimension, 20 as Dimension, 31 as Dimension);
-    let container = Box::new(x, y, z);
+    let container = Block::new(x, y, z);
     assert_eq!(
         container.best_fit(&item),
         Some(vec![
-            Box::new(7 as Dimension, 13 as Dimension, 31 as Dimension),
-            Box::new(7 as Dimension, 20 as Dimension, 31 as Dimension)
+            Block::new(7 as Dimension, 13 as Dimension, 31 as Dimension),
+            Block::new(7 as Dimension, 20 as Dimension, 31 as Dimension)
         ])
     );
     Ok(())

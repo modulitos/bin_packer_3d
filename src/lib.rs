@@ -1,7 +1,7 @@
-mod cuboid;
+mod block;
 mod error;
 
-pub use cuboid::Box;
+pub use block::Block;
 
 // TODO: update this with new tests
 #[cfg(test)]
