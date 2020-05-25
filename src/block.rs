@@ -1,12 +1,14 @@
-use crate::block::FirstFitKind::{DoubledFit, ExactFit, GreaterThanFit};
+use crate::block::BestFitKind::{DoubledFit, ExactFit, GreaterThanFit};
 use crate::error::Result;
 use std::cmp::Ordering::Equal;
 
 type Dimension = f32;
 type Volume = f32;
 
-enum FirstFitKind {
-    // usize contains the index of the dim that matches the first fit
+// Represents the kinds of fits we support in the best-fit section of our algorithm.
+
+enum BestFitKind {
+    // usize contains the index of the dim that matches the best fit
     DoubledFit(usize),
     ExactFit(usize),
     GreaterThanFit(usize),
@@ -16,6 +18,8 @@ enum FirstFitKind {
 pub struct Block {
     dims: [Dimension; 3],
 }
+
+// Represents a 3-dimensional cuboid.
 
 impl Block {
     fn new(d1: Dimension, d2: Dimension, d3: Dimension) -> Self {
@@ -28,7 +32,7 @@ impl Block {
         self.dims.iter().map(|&dim| Volume::from(dim)).product()
     }
 
-    // Returns a boolean regarding whether or not an item will fit into the box.
+    // Returns a boolean regarding whether or not an item will fit into the block.
 
     fn does_it_fit(&self, other: &Block) -> bool {
         self.dims
@@ -37,9 +41,9 @@ impl Block {
             .all(|(d, other_d)| d >= other_d)
     }
 
-    // This is a rotation method to rotate the item by first checking if the item
-    // MUST be rotated in a specific direction based on size constraints, then
-    // rotates it so it leaves the largest bulk volume left in the box
+    // This is a rotation method to rotate the item first checking if the item MUST be rotated in a
+    // specific direction based on size constraints, then rotates it so it leaves the largest bulk
+    // volume left in the container.
 
     fn _get_side_2_side_3(&self, item: &Block, side_1: usize) -> (usize, usize) {
         if item.dims[1] > self.dims[(side_1 + 2) % 3] {
@@ -51,10 +55,10 @@ impl Block {
         }
     }
 
-    // Find the first fit where the longest side of our item fits into the
-    // shortest side of our container.
+    // Find the best fit where the longest side of our item fits into the shortest side of our
+    // container.
 
-    fn _get_first_fit(&self, item: &Block) -> FirstFitKind {
+    fn _get_best_fit(&self, item: &Block) -> BestFitKind {
         let doubled_fit_side = self.dims.iter().enumerate().find_map(|(i, side)| {
             if side >= &(item.dims[2] * 2 as Dimension) {
                 Some(i)
@@ -92,16 +96,17 @@ impl Block {
         }
     }
 
-    // Finds the shortest length of the container that will fit the longest
-    // length of the item.
+    // Finds the shortest length of the container that will fit the longest length of the item.
     //
-    // Uses first fit, then rotates for remaining largest volume block(s)
+    // Uses best fit to maximize for the volume of the remaining blocks in the container. The item
+    // and the remaining blocks are rotated to optimize for the largest possible volume in the
+    // remaining blocks.
     //
-    // Returns a list of the remaining dimensions in the container, sorted by non-decreasing volume.
+    // Returns a list of the remaining blocks in the container
     //
     // example:
-    //   >>> Box::new(10,10,10).best_fit(Box::new(5,5,5))
-    //       [ Box<5,5,5>, Box<5,5,10>, Box<5,10,10> ]
+    //   >>> Block::new(10,10,10).best_fit(Block::new(5,5,5))
+    //       [ Block<5,5,5>, Block<5,5,10>, Block<5,10,10> ]
 
     pub fn best_fit(mut self, item: &Block) -> Option<Vec<Block>> {
         if !self.does_it_fit(&item) {
@@ -110,11 +115,12 @@ impl Block {
 
         let mut blocks = vec![];
 
-        let side_1 = match self._get_first_fit(item) {
+        let side_1 = match self._get_best_fit(item) {
             DoubledFit(i) => {
-                // choose the shortest side of the box we can stack the item twice on its longest
-                // side based on theory of if b_dim / 2 >= s_dim, don't open a new bin (or don't
-                // rotate the box).
+
+                // choose the shortest side of the container we can stack the item twice on its
+                // longest side based on theory of if b_dim / 2 >= s_dim, don't open a new block (or
+                // don't rotate the item).
 
                 let block_1 = Block::new(
                     self.dims[i] - item.dims[2],
@@ -122,7 +128,7 @@ impl Block {
                     self.dims[(i + 1) % 3],
                 );
 
-                // reset the box dimensions to being the height of the item:
+                // reset the container's dimensions to being the height of the item:
 
                 self.dims[i] = item.dims[2];
 
@@ -136,8 +142,10 @@ impl Block {
                 i
             }
             GreaterThanFit(i) => {
-                //  If we can't do either of the above, then chose the shortest side of the
-                //  container where we can stack the longest side of the item:
+
+                // If we can't do either of the above, then choose the shortest side of the
+                // container where we can stack the longest side of the item: i = sides.find {
+                // |side| dims[side] >= item.dims[2] }
 
                 blocks.push(Block::new(
                     self.dims[i] - item.dims[2],
@@ -205,34 +213,34 @@ impl Block {
 }
 
 #[test]
-fn test_box_creation() -> Result<()> {
+fn test_block_creation() -> Result<()> {
     Block::new(1 as Dimension, 2 as Dimension, 3 as Dimension);
     Ok(())
 }
 
 #[test]
-fn test_box_creation_sorts() -> Result<()> {
+fn test_block_creation_sorts() -> Result<()> {
     let b = Block::new(2 as Dimension, 1 as Dimension, 3 as Dimension);
     assert_eq!(b.dims, [1 as Dimension, 2 as Dimension, 3 as Dimension]);
     Ok(())
 }
 
 #[test]
-fn test_box_volume() -> Result<()> {
+fn test_block_volume() -> Result<()> {
     let b = Block::new(3 as Dimension, 4 as Dimension, 5 as Dimension);
     assert_eq!(b.volume(), 60 as Dimension);
     Ok(())
 }
 
 #[test]
-fn test_box_volume_large_values() -> Result<()> {
+fn test_block_volume_large_values() -> Result<()> {
     let b = Block::new(200 as Dimension, 100 as Dimension, 200 as Dimension);
     assert_eq!(b.volume(), 4_000_000 as Dimension);
     Ok(())
 }
 
 #[test]
-fn test_box_does_it_fit() -> Result<()> {
+fn test_block_does_it_fit() -> Result<()> {
     // test that when an item fits, it returns true
     let item = Block::new(3.5, 12.7, 14 as Dimension);
     let container = Block::new(4 as Dimension, 22 as Dimension, 14 as Dimension);
@@ -241,7 +249,7 @@ fn test_box_does_it_fit() -> Result<()> {
 }
 
 #[test]
-fn test_box_does_it_fit_false() -> Result<()> {
+fn test_block_does_it_fit_false() -> Result<()> {
     // test that when a item does not fit, it returns false
     let item = Block::new(4 as Dimension, 12 as Dimension, 14 as Dimension);
     let container = Block::new(3 as Dimension, 14 as Dimension, 14 as Dimension);
