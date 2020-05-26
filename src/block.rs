@@ -4,7 +4,7 @@ use std::cmp::Ordering::Equal;
 pub type Dimension = f32;
 type Volume = f32;
 
-// Represents the kinds of fits we support in the best-fit section of our algorithm.
+/// Represents the kinds of fits we support in the best-fit section of our algorithm.
 
 enum BestFitKind {
     // usize contains the index of the dim that matches the best fit
@@ -13,12 +13,12 @@ enum BestFitKind {
     GreaterThanFit(usize),
 }
 
+/// Represents a 3-dimensional cuboid.
+
 #[derive(Debug, PartialEq)]
 pub struct Block {
     dims: [Dimension; 3],
 }
-
-// Represents a 3-dimensional cuboid.
 
 impl Block {
     pub fn new(d1: Dimension, d2: Dimension, d3: Dimension) -> Self {
@@ -31,7 +31,7 @@ impl Block {
         self.dims.iter().map(|&dim| Volume::from(dim)).product()
     }
 
-    // Returns a boolean regarding whether or not an item will fit into the block.
+    /// Returns a boolean regarding whether or not an item will fit into the block.
 
     pub fn does_it_fit(&self, other: &Block) -> bool {
         self.dims
@@ -40,17 +40,17 @@ impl Block {
             .all(|(d, other_d)| d >= other_d)
     }
 
-    // Finds the shortest length of the container that will fit the longest length of the item.
-    //
-    // Uses best fit to maximize for the volume of the remaining blocks in the container. The item
-    // and the remaining blocks are rotated to optimize for the largest possible volume in the
-    // remaining blocks.
-    //
-    // Returns a list of the remaining blocks in the container
-    //
-    // example:
-    //   >>> Block::new(10,10,10).best_fit(Block::new(5,5,5))
-    //       [ Block<5,5,5>, Block<5,5,10>, Block<5,10,10> ]
+    /// Finds the shortest length of the container that will fit the longest length of the item.
+    ///
+    /// Uses best fit to maximize for the volume of the remaining blocks in the container. The item
+    /// and the remaining blocks are rotated to optimize for the largest possible volume in the
+    /// remaining blocks.
+    ///
+    /// Returns a list of the remaining blocks in the container
+    ///
+    /// example:
+    ///   >>> Block::new(10,10,10).best_fit(Block::new(5,5,5))
+    ///       [ Block<5,5,5>, Block<5,5,10>, Block<5,10,10> ]
 
     pub fn best_fit(mut self, item: &Block) -> Option<Vec<Block>> {
         if !self.does_it_fit(&item) {
