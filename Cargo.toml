@@ -1,5 +1,5 @@
 [package]
-name = "bin_packing_3d_rust"
+name = "bin_packer_3d"
 version = "0.1.0"
 authors = ["modulitos <modulitos@users.noreply.github.com>"]
 edition = "2018"
