@@ -1,6 +1,9 @@
 use crate::block::BestFitKind::{DoubledFit, ExactFit, GreaterThanFit};
 use std::cmp::Ordering::Equal;
 
+// TODO: explore using a fixed-decimal type. (eg: u16 for the integer, and u8 for the two decmial
+// places)
+
 pub type Dimension = f32;
 type Volume = f32;
 
@@ -15,7 +18,7 @@ enum BestFitKind {
 
 /// Represents a 3-dimensional cuboid.
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Block {
     dims: [Dimension; 3],
 }

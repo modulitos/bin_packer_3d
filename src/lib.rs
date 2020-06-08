@@ -26,7 +26,11 @@ as proposed in the paper titled "The Three-Dimensional Bin Packing Problem" (Mar
 
 mod block;
 
-mod packing_algorithm;
+/// A struct representing the items we'll be packing into the bin.
+pub mod item;
+
+/// Our packing algorithm.
+pub mod packing_algorithm;
 mod error;
 
 #[cfg(test)]
