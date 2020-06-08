@@ -1,4 +1,6 @@
 use crate::block::{Block, Dimension};
+use crate::item::Item;
+use crate::bin::Bin;
 use crate::error::Result;
 
 mod block {
@@ -7,6 +9,18 @@ mod block {
     #[test]
     fn test_block_creation() -> Result<()> {
         Block::new(1 as Dimension, 2 as Dimension, 3 as Dimension);
+        Ok(())
+    }
+
+    #[test]
+    fn test_item_creation() -> Result<()> {
+        Item::new(String::from("asdf"), [1 as Dimension, 2 as Dimension, 3 as Dimension]);
+        Ok(())
+    }
+
+    #[test]
+    fn test_bin_creation() -> Result<()> {
+        Bin::new([1 as Dimension, 2 as Dimension, 3 as Dimension]);
         Ok(())
     }
 

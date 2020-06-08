@@ -29,9 +29,12 @@ mod block;
 /// A struct representing the items we'll be packing into the bin.
 pub mod item;
 
+/// A struct representing the bin where we'll be packing the items.
+pub mod bin;
+
 /// Our packing algorithm.
 pub mod packing_algorithm;
-mod error;
+pub mod error;
 
 #[cfg(test)]
 mod tests;

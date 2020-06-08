@@ -1,5 +1,7 @@
 use crate::block::{Block, Dimension};
+use crate::error::{Result, Error};
 use crate::item::Item;
+use crate::bin::Bin;
 
 // TODO: update docs:
 /// While loop to pack items into a bin, using a First Fit Descending approach.
@@ -22,9 +24,13 @@ use crate::item::Item;
 ///
 /// >>> pack_bins([5,5,10], [[5,5,10], [5,5,6], [5,5,4]]) [ [[5,5,10]],
 ///     [[5,5,6], [5,5,4]] ]
-pub fn packing_algorithm(bin_dimensions: [Dimension; 3], items: &Vec<Item>) -> Vec<Vec<String>> {
+pub fn packing_algorithm(bin: Bin, items: &Vec<Item>) -> Result<Vec<Vec<String>>> {
     // remaining_blocks is a list of Block objects, representing the available
     // space into which items can be added.
+
+    if !items.iter().all(|item| bin.does_item_fit(item)) {
+        return Err(Error::ItemsNoFit(format!("All items must fit within the bin dimensions.")));
+    }
 
     let mut remaining_blocks = Vec::<Block>::new();
 
@@ -34,11 +40,7 @@ pub fn packing_algorithm(bin_dimensions: [Dimension; 3], items: &Vec<Item>) -> V
 
     while !items_to_pack.is_empty() {
         if remaining_blocks.is_empty() {
-            remaining_blocks.push(Block::new(
-                bin_dimensions[0],
-                bin_dimensions[1],
-                bin_dimensions[2],
-            ));
+            remaining_blocks.push(bin.block.clone());
             packed_items.push(vec![]);
         }
         remaining_blocks = remaining_blocks
@@ -69,5 +71,5 @@ pub fn packing_algorithm(bin_dimensions: [Dimension; 3], items: &Vec<Item>) -> V
             .collect::<Vec<Block>>();
     }
 
-    packed_items
+    Ok(packed_items)
 }
