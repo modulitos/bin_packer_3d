@@ -14,7 +14,7 @@ mod block {
 
     #[test]
     fn test_item_creation() -> Result<()> {
-        Item::new(String::from("asdf"), [1 as Dimension, 2 as Dimension, 3 as Dimension]);
+        Item::new("asdf", [1 as Dimension, 2 as Dimension, 3 as Dimension]);
         Ok(())
     }
 

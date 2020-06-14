@@ -1,7 +1,7 @@
-use crate::block::{Block, Dimension};
-use crate::error::{Result, Error};
-use crate::item::Item;
 use crate::bin::Bin;
+use crate::block::{Block, Dimension};
+use crate::error::{Error, Result};
+use crate::item::Item;
 
 // TODO: update docs:
 /// While loop to pack items into a bin, using a First Fit Descending approach.
@@ -24,19 +24,21 @@ use crate::bin::Bin;
 ///
 /// >>> pack_bins([5,5,10], [[5,5,10], [5,5,6], [5,5,4]]) [ [[5,5,10]],
 ///     [[5,5,6], [5,5,4]] ]
-pub fn packing_algorithm(bin: Bin, items: &Vec<Item>) -> Result<Vec<Vec<String>>> {
+pub fn packing_algorithm<'a>(bin: Bin, items: &'a Vec<Item>) -> Result<Vec<Vec<&'a str>>> {
     // remaining_blocks is a list of Block objects, representing the available
     // space into which items can be added.
 
     if !items.iter().all(|item| bin.does_item_fit(item)) {
-        return Err(Error::ItemsNoFit(format!("All items must fit within the bin dimensions.")));
+        return Err(Error::ItemsNoFit(format!(
+            "All items must fit within the bin dimensions."
+        )));
     }
 
     let mut remaining_blocks = Vec::<Block>::new();
 
     let mut items_to_pack = items.clone();
 
-    let mut packed_items: Vec<Vec<String>> = Vec::<Vec<String>>::new();
+    let mut packed_items: Vec<Vec<&str>> = Vec::<Vec<&str>>::new();
 
     while !items_to_pack.is_empty() {
         if remaining_blocks.is_empty() {
@@ -61,7 +63,7 @@ pub fn packing_algorithm(bin: Bin, items: &Vec<Item>) -> Result<Vec<Vec<String>>
                     packed_items
                         .last_mut()
                         .expect("packed_items must not be empty!")
-                        .push(String::from(&item.id));
+                        .push(item.id);
                     items_to_pack.remove(i);
                     block.best_fit(&item.block).unwrap_or(vec![])
                 } else {
