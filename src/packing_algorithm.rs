@@ -1,9 +1,8 @@
 use crate::bin::Bin;
-use crate::block::{Block, Dimension};
+use crate::block::Block;
 use crate::error::{Error, Result};
 use crate::item::Item;
 
-// TODO: update docs:
 /// While loop to pack items into a bin, using a First Fit Descending approach.
 ///
 /// When you pack an item into a bin, find the best fit, which will change the dimensions available
@@ -13,18 +12,15 @@ use crate::item::Item;
 /// there are no more items needing to be packed, returns a list of lists of the items in their
 /// bins. (first bin is first nested list, second is the second, etc.)
 ///
-/// Dims = [ int|float, int|float, int|float] - this is a list of 3 ints or floats, representing a
-/// cuboid block for either our bins or items.
-///
 /// returns:
-///   * [[String]]: list of lists representing all items in their bins. Length
+///   * [[&str]]: list of lists representing all items in their bins. Length
 ///     of the outer list is the number of bins we'll use, and length of each
 ///     subarray is the number of items in each bin. The value of each item in
 ///     the subarray corresponds to the item's id.
 ///
 /// >>> pack_bins([5,5,10], [[5,5,10], [5,5,6], [5,5,4]]) [ [[5,5,10]],
 ///     [[5,5,6], [5,5,4]] ]
-pub fn packing_algorithm<'a>(bin: Bin, items: &'a Vec<Item>) -> Result<Vec<Vec<&'a str>>> {
+pub fn packing_algorithm<'a>(bin: Bin, items: &'a Vec<Item<'_>>) -> Result<Vec<Vec<&'a str>>> {
     // remaining_blocks is a list of Block objects, representing the available
     // space into which items can be added.
 
@@ -57,7 +53,7 @@ pub fn packing_algorithm<'a>(bin: Bin, items: &'a Vec<Item>) -> Result<Vec<Vec<&
                     // here?
                     .cloned()
                     .enumerate()
-                    .find(|(i, item)| block.does_it_fit(&item.block))
+                    .find(|(_, item)| block.does_it_fit(&item.block))
                 {
                     // Add the id to our packed_items:
                     packed_items

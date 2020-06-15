@@ -27,13 +27,19 @@ as proposed in the paper titled "The Three-Dimensional Bin Packing Problem" (Mar
 mod block;
 
 /// A struct representing the items we'll be packing into the bin.
+
 pub mod item;
 
 /// A struct representing the bin where we'll be packing the items.
+
 pub mod bin;
 
-/// Our packing algorithm.
+/// Defines the function that will be used for our packing algorithm.
+
 pub mod packing_algorithm;
+
+/// Defines an Error type and a Result type, which can be raised from the packing algorithm.
+
 pub mod error;
 
 #[cfg(test)]
