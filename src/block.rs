@@ -50,7 +50,9 @@ impl Block {
     /// and the remaining blocks are rotated to optimize for the largest possible volume in the
     /// remaining blocks.
     ///
-    /// Returns a list of the remaining blocks in the container
+    /// Returns a vec of the remaining blocks in the container
+    ///
+    /// If an item doesn't fit, we return None.
     ///
     /// example:
     ///   >>> Block::new(10,10,10).best_fit(Block::new(5,5,5))

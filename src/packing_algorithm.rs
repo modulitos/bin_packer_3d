@@ -30,7 +30,7 @@ pub fn packing_algorithm<'a>(bin: Bin, items: &'a Vec<Item<'_>>) -> Result<Vec<V
         )));
     }
 
-    let mut remaining_blocks = Vec::<Block>::new();
+    let mut remaining_bins = Vec::<Bin>::new();
 
     let mut items_to_pack = items.clone();
 
@@ -41,13 +41,13 @@ pub fn packing_algorithm<'a>(bin: Bin, items: &'a Vec<Item<'_>>) -> Result<Vec<V
     let mut packed_items: Vec<Vec<&str>> = Vec::<Vec<&str>>::new();
 
     while !items_to_pack.is_empty() {
-        if remaining_blocks.is_empty() {
-            remaining_blocks.push(bin.block.clone());
+        if remaining_bins.is_empty() {
+            remaining_bins.push(bin.clone());
             packed_items.push(vec![]);
         }
-        remaining_blocks = remaining_blocks
+        remaining_bins = remaining_bins
             .into_iter()
-            .flat_map(|block| {
+            .flat_map(|bin| {
 
                 // iterator using find then manual map:
 
@@ -57,7 +57,7 @@ pub fn packing_algorithm<'a>(bin: Bin, items: &'a Vec<Item<'_>>) -> Result<Vec<V
                     // here?
                     .cloned()
                     .enumerate()
-                    .find(|(_, item)| block.does_it_fit(&item.block))
+                    .find(|(_, item)| bin.does_item_fit(&item))
                 {
                     // Add the id to our packed_items:
                     packed_items
@@ -65,12 +65,12 @@ pub fn packing_algorithm<'a>(bin: Bin, items: &'a Vec<Item<'_>>) -> Result<Vec<V
                         .expect("packed_items must not be empty!")
                         .push(item.id);
                     items_to_pack.remove(i);
-                    block.best_fit(&item.block).unwrap_or(vec![])
+                    bin.best_fit(&item).unwrap_or(vec![])
                 } else {
                     vec![]
                 }
             })
-            .collect::<Vec<Block>>();
+            .collect::<Vec<Bin>>();
     }
 
     Ok(packed_items)
