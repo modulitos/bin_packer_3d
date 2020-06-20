@@ -1,10 +1,11 @@
 [package]
 name = "bin_packer_3d"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["modulitos <modulitos@users.noreply.github.com>"]
 edition = "2018"
 repository = "https://github.com/modulitos/bin_packer_3d"
 description = "Three dimensional fitting algorithm to fit smaller boxes inside of a larger box"
+documentation = "https://docs.rs/bin_packer_3d"
 keywords = ["packing", "pack", "bin", "box", "3d"]
 license = "MIT"
 readme = "README.md"
