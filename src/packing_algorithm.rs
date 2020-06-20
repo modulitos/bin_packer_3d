@@ -34,6 +34,10 @@ pub fn packing_algorithm<'a>(bin: Bin, items: &'a Vec<Item<'_>>) -> Result<Vec<V
 
     let mut items_to_pack = items.clone();
 
+    // Sort the items in descending order, where order is based on the longest dimension:
+
+    items_to_pack.sort_by(|a, b| b.cmp(&a));
+
     let mut packed_items: Vec<Vec<&str>> = Vec::<Vec<&str>>::new();
 
     while !items_to_pack.is_empty() {

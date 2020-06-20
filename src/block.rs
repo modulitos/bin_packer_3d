@@ -20,7 +20,8 @@ enum BestFitKind {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Block {
-    dims: [Dimension; 3],
+    // The dimensions, sorted in ascending order.
+    pub dims: [Dimension; 3],
 }
 
 impl Block {

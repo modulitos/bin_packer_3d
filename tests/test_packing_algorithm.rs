@@ -72,8 +72,7 @@ fn test_odd_sizes() -> Result<()> {
     Ok(())
 }
 
-// TODO: get this test working by sorting the tiems before packing them.
-// #[test]
+#[test]
 fn test_odd_sizes_unordered() -> Result<()> {
     // test odd sized items will be sorted to fit.
     let item_1 = Item::new("item1", [3.0, 8.0, 10.0]);
