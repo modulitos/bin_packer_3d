@@ -1,4 +1,4 @@
-# bin_packing_3d
+# bin_packer_3d
 <!-- "short sentence explaining what it is"] -->
 
 This crate solves the problem of "fitting smaller boxes inside of a larger box" using a three
