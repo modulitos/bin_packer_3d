@@ -155,7 +155,7 @@ fn test_100_items_inexact_fit_2_bins() -> Result<()> {
 fn test_big_die_and_serveral_decks_of_cards() -> Result<()> {
     let deck = Item::new("deck", [2.0, 8.0, 12.0]);
     let die = Item::new("die", [8.0, 8.0, 8.0]);
-    let items = vec![deck.clone(), deck.clone(), deck.clone(), deck, die];
+    let items = vec![deck.clone(), deck.clone(), die, deck.clone(), deck];
     let res = packing_algorithm(Bin::new([8.0, 8.0, 12.0]), &items)?;
     assert_eq!(res.len(), 2);
     assert_eq!(res, vec![["deck"; 4].to_vec(), vec!["die"]]);
