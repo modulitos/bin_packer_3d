@@ -47,27 +47,22 @@ pub fn packing_algorithm<'a>(bin: Bin, items: &'a Vec<Item<'_>>) -> Result<Vec<V
         remaining_bins = remaining_bins
             .into_iter()
             .flat_map(|bin| {
-
-                // iterator using find then manual map:
-
-                if let Some((i, item)) = items_to_pack
-                    .iter()
-                    // TODO: is there a better way to structure this logic, to avoid having to clone
-                    // here?
-                    .cloned()
+                items_to_pack
+                    .clone()
+                    .into_iter()
                     .enumerate()
-                    .find(|(_, item)| bin.does_item_fit(&item))
-                {
-                    // Add the id to our packed_items:
-                    packed_items
-                        .last_mut()
-                        .expect("packed_items must not be empty!")
-                        .push(item.id);
-                    items_to_pack.remove(i);
-                    bin.best_fit(&item).unwrap_or(vec![])
-                } else {
-                    vec![]
-                }
+                    .find_map(|(i, item)| {
+                        let remaining_bins = bin.clone().best_fit(&item)?;
+                        // Add the id to our packed_items:
+                        packed_items
+                            .last_mut()
+                            .expect("packed_items must not be empty!")
+                            .push(item.id);
+                        items_to_pack.remove(i);
+                        Some(remaining_bins)
+                    })
+                    // If no items can be fitted into the bin, then skip the bin:
+                    .unwrap_or(vec![])
             })
             .collect::<Vec<Bin>>();
     }
