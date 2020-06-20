@@ -162,9 +162,9 @@ impl Block {
 
     fn _get_side_2_side_3(&self, item: &Block, side_1: usize) -> (usize, usize) {
         if item.dims[1] > self.dims[(side_1 + 2) % 3] {
-            (side_1 - 2, side_1 - 1)
+            ((side_1 + 1) % 3, (side_1 + 2) % 3)
         } else if item.dims[1] > self.dims[(side_1 + 1) % 3] {
-            (side_1 - 1, side_1 - 2)
+            ((side_1 + 2) % 3, (side_1 + 1) % 3)
         } else {
             ((side_1 + 1) % 3, (side_1 + 2) % 3)
         }
@@ -210,6 +210,4 @@ impl Block {
             }
         }
     }
-
 }
-
