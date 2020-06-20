@@ -1,6 +1,5 @@
 use crate::block::{Block, Dimension};
 use crate::item::Item;
-use std::iter::FromIterator;
 
 /// Represents an item that a user will insert into a bin.
 #[derive(Clone, Debug)]
@@ -23,11 +22,11 @@ impl Bin {
     }
 
     /// Returns the remaining bins after the item has been added to the current bin.
+    /// Returns None if the item is too big to fit into the bin.
     pub fn best_fit(self, item: &Item<'_>) -> Option<Vec<Bin>> {
-        Some(self.block.best_fit(&item.block)?
-            .into_iter()
-            .map(|block| Bin::from(block))
-            .collect())
+        self.block
+            .best_fit(&item.block)
+            .map(|blocks| blocks.into_iter().map(|block| Bin::from(block)).collect())
     }
 }
 

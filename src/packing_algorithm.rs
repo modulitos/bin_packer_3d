@@ -1,5 +1,4 @@
 use crate::bin::Bin;
-use crate::block::Block;
 use crate::error::{Error, Result};
 use crate::item::Item;
 
@@ -21,14 +20,14 @@ use crate::item::Item;
 /// >>> pack_bins([5,5,10], [[5,5,10], [5,5,6], [5,5,4]]) [ [[5,5,10]],
 ///     [[5,5,6], [5,5,4]] ]
 pub fn packing_algorithm<'a>(bin: Bin, items: &'a Vec<Item<'_>>) -> Result<Vec<Vec<&'a str>>> {
-    // remaining_blocks is a list of Block objects, representing the available
-    // space into which items can be added.
-
     if !items.iter().all(|item| bin.does_item_fit(item)) {
         return Err(Error::ItemsNoFit(format!(
             "All items must fit within the bin dimensions."
         )));
     }
+
+    // remaining_bins is a list of Bins, representing the available space into which items can be
+    // added.
 
     let mut remaining_bins = Vec::<Bin>::new();
 
