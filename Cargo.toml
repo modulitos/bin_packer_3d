@@ -3,6 +3,10 @@ name = "bin_packer_3d"
 version = "0.1.0"
 authors = ["modulitos <modulitos@users.noreply.github.com>"]
 edition = "2018"
+repository = "https://github.com/modulitos/bin_packing_3d"
+description = "Three dimensional fitting algorithm to fit smaller boxes inside of a larger box"
+keywords = ["packing", "pack", "bin", "box", "3d"]
+license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
