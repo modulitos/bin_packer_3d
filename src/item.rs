@@ -3,6 +3,10 @@ use std::cmp::Ordering;
 use std::cmp::Ordering::Equal;
 
 /// Represents an item that a user will insert into a bin.
+/// ```rust
+///   use bin_packer_3d::item::Item;
+///   let item = Item::new("deck", [2.0, 8.0, 12.0]);
+/// ```
 #[derive(Clone, Debug)]
 pub struct Item<'a> {
     /// a string slice of the id

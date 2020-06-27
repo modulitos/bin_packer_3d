@@ -8,11 +8,16 @@ pub type Dimension = f32;
 type Volume = f32;
 
 /// Represents the kinds of fits we support in the best-fit section of our algorithm.
+/// usize contains the index of the dim where the best-fit has been matched.
 
 enum BestFitKind {
-    // usize contains the index of the dim that matches the best fit
+    /// When the side of the container is more than twice the length of the item's matching side.
     DoubledFit(usize),
+
+    /// When the item's side fits perfects across the length of our container.
     ExactFit(usize),
+
+    /// When the side of the container is longer than the length of the item's matching side.
     GreaterThanFit(usize),
 }
 
@@ -20,7 +25,7 @@ enum BestFitKind {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Block {
-    // The dimensions, sorted in ascending order.
+    /// The dimensions, sorted in ascending order.
     pub dims: [Dimension; 3],
 }
 
@@ -44,20 +49,29 @@ impl Block {
             .all(|(d, other_d)| d >= other_d)
     }
 
-    /// Finds the shortest length of the container that will fit the longest length of the item.
-    ///
-    /// Uses best fit to maximize for the volume of the remaining blocks in the container. The item
-    /// and the remaining blocks are rotated to optimize for the largest possible volume in the
-    /// remaining blocks.
-    ///
-    /// Returns a vec of the remaining blocks in the container
-    ///
-    /// If an item doesn't fit, we return None.
-    ///
-    /// example:
-    ///   >>> Block::new(10,10,10).best_fit(Block::new(5,5,5))
-    ///       [ Block<5,5,5>, Block<5,5,10>, Block<5,10,10> ]
+    /**
+    Finds the shortest length of the container that will fit the longest length of the item.
 
+    Uses best fit to maximize for the volume of the remaining blocks in the container. The item
+    and the remaining blocks are rotated to optimize for the largest possible volume in the
+    remaining blocks.
+
+    Returns a vec of the remaining blocks in the container
+
+    If an item doesn't fit, we return None.
+
+    /// ```rust
+    ///   let item = Block::new(1 as Dimension, 1 as Dimension, 1 as Dimension);
+    ///   let container = Block::new(1 as Dimension, 2 as Dimension, 2 as Dimension);
+    ///   assert_eq!(
+    ///       container.best_fit(&item),
+    ///       Some(vec![
+    ///           Block::new(1 as Dimension, 1 as Dimension, 1 as Dimension),
+    ///           Block::new(1 as Dimension, 1 as Dimension, 2 as Dimension)
+    ///       ])
+    ///   );
+    /// ```
+    **/
     pub fn best_fit(mut self, item: &Block) -> Option<Vec<Block>> {
         if !self.does_it_fit(&item) {
             return None;

@@ -2,6 +2,11 @@ use crate::block::{Block, Dimension};
 use crate::item::Item;
 
 /// Represents an item that a user will insert into a bin.
+/// ```rust
+/// use bin_packer_3d::bin::Bin;
+/// let bin = Bin::new([1.0, 2.0, 3.0]);
+/// ```
+
 #[derive(Clone, Debug)]
 pub struct Bin {
     /// Represents the cuboid of this Bin.

@@ -2,23 +2,30 @@ use crate::bin::Bin;
 use crate::error::{Error, Result};
 use crate::item::Item;
 
-/// While loop to pack items into a bin, using a First Fit Descending approach.
-///
-/// When you pack an item into a bin, find the best fit, which will change the dimensions available
-/// to pack items into. While there are still items to pack and dimensions large enough to hold at
-/// least one of the items, it will continue to pack the same bin. If there is no remaining space in
-/// the bin large enough for an item, a new dimension will be added to the available blocks. After
-/// there are no more items needing to be packed, returns a list of lists of the items in their
-/// bins. (first bin is first nested list, second is the second, etc.)
-///
-/// returns:
-///   * [[&str]]: list of lists representing all items in their bins. Length
-///     of the outer list is the number of bins we'll use, and length of each
-///     subarray is the number of items in each bin. The value of each item in
-///     the subarray corresponds to the item's id.
-///
-/// >>> pack_bins([5,5,10], [[5,5,10], [5,5,6], [5,5,4]]) [ [[5,5,10]],
-///     [[5,5,6], [5,5,4]] ]
+/**
+While loop to pack items into a bin, using a First Fit Descending approach.
+
+When you pack an item into a bin, find the best fit, which will change the dimensions available
+to pack items into. While there are still items to pack and dimensions large enough to hold at
+least one of the items, it will continue to pack the same bin. If there is no remaining space in
+the bin large enough for an item, a new dimension will be added to the available blocks. After
+there are no more items needing to be packed, returns a list of lists of the items in their
+bins. (first bin is first nested list, second is the second, etc.)
+
+```rust
+  use bin_packer_3d::bin::Bin;
+  use bin_packer_3d::item::Item;
+  use bin_packer_3d::packing_algorithm::packing_algorithm;
+
+  let deck = Item::new("deck", [2.0, 8.0, 12.0]);
+  let die = Item::new("die", [8.0, 8.0, 8.0]);
+  let items = vec![deck.clone(), deck.clone(), die, deck.clone(), deck];
+
+  let packed_items = packing_algorithm(Bin::new([8.0, 8.0, 12.0]), &items);
+  assert_eq!(packed_items, Ok(vec![vec!["deck", "deck", "deck", "deck"], vec!["die"]]));
+```
+**/
+
 pub fn packing_algorithm<'a>(bin: Bin, items: &'a Vec<Item<'_>>) -> Result<Vec<Vec<&'a str>>> {
     if !items.iter().all(|item| bin.does_item_fit(item)) {
         return Err(Error::ItemsNoFit(format!(
