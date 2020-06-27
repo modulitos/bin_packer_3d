@@ -1,6 +1,10 @@
 use crate::bin::Bin;
 use crate::error::{Error, Result};
 use crate::item::Item;
+use num_traits::{Num, FromPrimitive};
+use std::iter::Product;
+use std::ops::Sub;
+use std::fmt::Debug;
 
 /// While loop to pack items into a bin, using a First Fit Descending approach.
 ///
@@ -19,7 +23,10 @@ use crate::item::Item;
 ///
 /// >>> pack_bins([5,5,10], [[5,5,10], [5,5,6], [5,5,4]]) [ [[5,5,10]],
 ///     [[5,5,6], [5,5,4]] ]
-pub fn packing_algorithm<'a>(bin: Bin, items: &'a Vec<Item<'_>>) -> Result<Vec<Vec<&'a str>>> {
+pub fn packing_algorithm<'a, T: Num + PartialOrd + FromPrimitive + Product + Debug >(
+    bin: Bin<T>,
+    items: &'a Vec<Item<'_, T>>,
+) -> Result<Vec<Vec<&'a str>>> {
     if !items.iter().all(|item| bin.does_item_fit(item)) {
         return Err(Error::ItemsNoFit(format!(
             "All items must fit within the bin dimensions."
@@ -29,7 +36,7 @@ pub fn packing_algorithm<'a>(bin: Bin, items: &'a Vec<Item<'_>>) -> Result<Vec<V
     // remaining_bins is a list of Bins, representing the available space into which items can be
     // added.
 
-    let mut remaining_bins = Vec::<Bin>::new();
+    let mut remaining_bins = Vec::<Bin<T>>::new();
 
     let mut items_to_pack = items.clone();
 
@@ -64,7 +71,7 @@ pub fn packing_algorithm<'a>(bin: Bin, items: &'a Vec<Item<'_>>) -> Result<Vec<V
                     // If no items can be fitted into the bin, then skip the bin:
                     .unwrap_or(vec![])
             })
-            .collect::<Vec<Bin>>();
+            .collect::<Vec<Bin<T>>>();
     }
 
     Ok(packed_items)
