@@ -2,6 +2,12 @@ use crate::block::{Block, Dimension};
 use std::cmp::Ordering;
 use std::cmp::Ordering::Equal;
 
+/// The item's id, represented as a string slice.
+///
+/// Although it's not enforced, it's highly recommended that each item has a unique ItemId.
+///
+pub type ItemId = str;
+
 /// Represents an item that a user will insert into a bin.
 /// ```rust
 ///   use bin_packer_3d::item::Item;
@@ -10,7 +16,7 @@ use std::cmp::Ordering::Equal;
 #[derive(Clone, Debug)]
 pub struct Item<'a> {
     /// a string slice of the id
-    pub id: &'a str,
+    pub id: &'a ItemId,
     /// a Block
     pub block: Block,
 }

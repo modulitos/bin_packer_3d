@@ -1,6 +1,6 @@
 use crate::bin::Bin;
 use crate::error::{Error, Result};
-use crate::item::Item;
+use crate::item::{Item, ItemId};
 
 /**
 While loop to pack items into a bin, using a First Fit Descending approach.
@@ -26,7 +26,7 @@ bins. (first bin is first nested list, second is the second, etc.)
 ```
 **/
 
-pub fn packing_algorithm<'a>(bin: Bin, items: &'a Vec<Item<'_>>) -> Result<Vec<Vec<&'a str>>> {
+pub fn packing_algorithm<'a>(bin: Bin, items: &'a Vec<Item<'_>>) -> Result<Vec<Vec<&'a ItemId>>> {
     if !items.iter().all(|item| bin.does_item_fit(item)) {
         return Err(Error::ItemsNoFit(format!(
             "All items must fit within the bin dimensions."
@@ -44,7 +44,7 @@ pub fn packing_algorithm<'a>(bin: Bin, items: &'a Vec<Item<'_>>) -> Result<Vec<V
 
     items_to_pack.sort_by(|a, b| b.cmp(&a));
 
-    let mut packed_items: Vec<Vec<&str>> = Vec::<Vec<&str>>::new();
+    let mut packed_items: Vec<Vec<&ItemId>> = Vec::new();
 
     while !items_to_pack.is_empty() {
         if remaining_bins.is_empty() {
