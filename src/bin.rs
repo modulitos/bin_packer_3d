@@ -1,7 +1,7 @@
 use crate::block::{Block, Dimension};
 use crate::item::Item;
 
-/// Represents an item that a user will insert into a bin.
+/// Represents an bin that a user can insert items into.
 /// ```rust
 /// use bin_packer_3d::bin::Bin;
 /// let bin = Bin::new([1.0, 2.0, 3.0]);

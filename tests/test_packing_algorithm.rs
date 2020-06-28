@@ -1,7 +1,18 @@
 use bin_packer_3d::bin::Bin;
 use bin_packer_3d::error::{Error, Result};
-use bin_packer_3d::item::Item;
+use bin_packer_3d::item::{Item, ItemId};
 use bin_packer_3d::packing_algorithm::packing_algorithm;
+
+#[test]
+fn test_pack_items_no_items() -> Result<()> {
+    let items = vec![];
+    let res = packing_algorithm(Bin::new([3.0, 4.5, 5.0]), &items)?;
+    assert_eq!(
+        res,
+        Vec::<Vec<&ItemId>>::new(),
+    );
+    Ok(())
+}
 
 #[test]
 fn test_pack_items_no_fit() -> Result<()> {
