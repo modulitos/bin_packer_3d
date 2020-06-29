@@ -7,7 +7,7 @@ pub enum Error {
     /// It is an invariant that each item must be able to fit within the bin's dimensions. If one or
     /// more items don't fit into the bin, then this error will be raised.
     ///
-    ItemsNoFit(String),
+    AllItemsMustFit(String),
 }
 
 /// This Result type is a convenience type that uses the BinPacker's Error type as a default.
