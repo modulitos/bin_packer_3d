@@ -96,4 +96,21 @@ impl<'a> Bin<'a> {
         self.items.push(item);
         Some(())
     }
+    /**
+
+    Returns a new bin that is the same dimensions as the original bin, but without any items.
+
+    ```rust
+        use bin_packer_3d::bin::Bin;
+        use bin_packer_3d::item::{Item, ItemId};
+        let bin = Bin::new([24.0, 10.0, 4.0]);
+        let new_bin = bin.clone_as_empty_bin();
+    ```
+    **/
+    pub fn clone_as_empty_bin(&self) -> Self {
+        Self {
+            blocks: self.blocks.clone(),
+            items: vec![],
+        }
+    }
 }

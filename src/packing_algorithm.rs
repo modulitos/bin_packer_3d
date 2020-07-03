@@ -43,7 +43,7 @@ pub fn packing_algorithm<'a>(
     items_to_pack.sort_by(|a, b| b.cmp(&a));
 
     let mut packed_bins: Vec<Bin<'a>> = Vec::new();
-    let mut bin_currently_packing = bin.clone();
+    let mut bin_currently_packing = bin.clone_as_empty_bin();
 
     loop {
         match (
@@ -57,22 +57,21 @@ pub fn packing_algorithm<'a>(
                 break;
             }
             (false, _) => {
-                if let Some(packed_item_index) =
-                    items_to_pack
-                        .clone()
-                        .into_iter()
-                        .enumerate()
-                        .find_map(|(item_index, item)| {
-                            bin_currently_packing.try_packing(item).map(|_| item_index)
-                        })
+                if let Some(packed_item_index) = items_to_pack
+                    .clone()
+                    .into_iter()
+                    .enumerate()
+                    .find_map(|(item_index, item)| {
+                        bin_currently_packing.try_packing(item).map(|_| item_index)
+                    })
                 {
                     items_to_pack.remove(packed_item_index);
                 } else {
-
                     // We can't fit any more items into the current bin - add it to our packed_bins, and
                     // open up a new bin to pack.
 
-                    let packed_bin = std::mem::replace(&mut bin_currently_packing, bin.clone());
+                    let packed_bin =
+                        std::mem::replace(&mut bin_currently_packing, bin.clone_as_empty_bin());
                     packed_bins.push(packed_bin);
                 }
             }
