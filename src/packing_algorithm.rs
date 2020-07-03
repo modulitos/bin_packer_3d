@@ -26,17 +26,15 @@ bins. (first bin is first nested list, second is the second, etc.)
 ```
 **/
 
-pub fn packing_algorithm<'a>(bin: Bin, items: &'a Vec<Item<'_>>) -> Result<Vec<Vec<&'a ItemId>>> {
-    if !items.iter().all(|item| bin.does_item_fit(item)) {
-        return Err(Error::ItemsNoFit(format!(
+pub fn packing_algorithm<'a>(
+    bin: Bin<'a>,
+    items: &'a Vec<Item<'_>>,
+) -> Result<Vec<Vec<&'a ItemId>>> {
+    if !items.iter().all(|item| bin.fits(item)) {
+        return Err(Error::AllItemsMustFit(format!(
             "All items must fit within the bin dimensions."
         )));
     }
-
-    // remaining_bins is a list of Bins, representing the available space into which items can be
-    // added.
-
-    let mut remaining_bins = Vec::<Bin>::new();
 
     let mut items_to_pack = items.clone();
 
@@ -44,35 +42,46 @@ pub fn packing_algorithm<'a>(bin: Bin, items: &'a Vec<Item<'_>>) -> Result<Vec<V
 
     items_to_pack.sort_by(|a, b| b.cmp(&a));
 
-    let mut packed_items: Vec<Vec<&ItemId>> = Vec::new();
+    let mut packed_bins: Vec<Bin<'a>> = Vec::new();
+    let mut bin_currently_packing = bin.clone_as_empty_bin();
 
-    while !items_to_pack.is_empty() {
-        if remaining_bins.is_empty() {
-            remaining_bins.push(bin.clone());
-            packed_items.push(vec![]);
-        }
-        remaining_bins = remaining_bins
-            .into_iter()
-            .flat_map(|bin| {
-                items_to_pack
+    loop {
+        match (
+            items_to_pack.is_empty(),
+            bin_currently_packing.items.is_empty(),
+        ) {
+            (true, true) => break,
+            (true, false) => {
+                // no more items to pack:
+                packed_bins.push(bin_currently_packing);
+                break;
+            }
+            (false, _) => {
+                if let Some(packed_item_index) = items_to_pack
                     .clone()
                     .into_iter()
                     .enumerate()
-                    .find_map(|(i, item)| {
-                        let remaining_bins = bin.clone().best_fit(&item)?;
-                        // Add the id to our packed_items:
-                        packed_items
-                            .last_mut()
-                            .expect("packed_items must not be empty!")
-                            .push(item.id);
-                        items_to_pack.remove(i);
-                        Some(remaining_bins)
+                    .find_map(|(item_index, item)| {
+                        bin_currently_packing.try_packing(item).map(|_| item_index)
                     })
-                    // If no items can be fitted into the bin, then skip the bin:
-                    .unwrap_or(vec![])
-            })
-            .collect::<Vec<Bin>>();
+                {
+                    items_to_pack.remove(packed_item_index);
+                } else {
+                    // We can't fit any more items into the current bin - add it to our packed_bins, and
+                    // open up a new bin to pack.
+
+                    let packed_bin =
+                        std::mem::replace(&mut bin_currently_packing, bin.clone_as_empty_bin());
+                    packed_bins.push(packed_bin);
+                }
+            }
+        }
     }
 
-    Ok(packed_items)
+    // map the bins back into their Vec<ItemId> representations:
+
+    Ok(packed_bins
+        .into_iter()
+        .map(|bin| bin.items.into_iter().map(|item| item.id).collect())
+        .collect())
 }
