@@ -3,6 +3,9 @@ use bin_packer_3d::error::{Error, Result};
 use bin_packer_3d::item::{Item, ItemId};
 use bin_packer_3d::packing_algorithm::packing_algorithm;
 
+
+/// test packing_algorithm API
+
 #[test]
 fn test_pack_items_no_items() -> Result<()> {
     let items = vec![];
@@ -202,5 +205,28 @@ fn test_flat_bin() -> Result<()> {
     let res = packing_algorithm(Bin::new([3.5, 9.5, 12.5]), &items)?;
     assert_eq!(res.len(), 2);
     assert_eq!(res.first().map(|packed| packed.len()), Some(2));
+    Ok(())
+}
+
+/// Test Bin API
+
+// NOTE: It's probably worth re-organizing our integration tests, perhaps grouping them by module.
+
+#[test]
+fn test_bin_try_packing() -> Result<()> {
+    let item_1 = Item::new("item1", [24.0, 10.0, 2.0]);
+    let item_2 = Item::new("item2", [24.0, 10.0, 2.0]);
+    let item_3 = Item::new("item3", [24.0, 10.0, 2.0]);
+    let mut bin = Bin::new([24.0, 10.0, 4.0]);
+    assert!(bin.try_packing(item_1).is_some());
+    assert!(bin.try_packing(item_2).is_some());
+    assert_eq!(bin.try_packing(item_3), None);
+    assert_eq!(
+        bin.items
+            .into_iter()
+            .map(|item| item.id)
+            .collect::<Vec<&ItemId>>(),
+        vec!["item1", "item2"]
+    );
     Ok(())
 }
