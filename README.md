@@ -1,3 +1,5 @@
+[<img alt="build status" src="https://img.shields.io/github/workflow/status/modulitos/bin_packer_3d/CI/master?style=for-the-badge" height="20">](https://github.com/modulitos/bin_packer_3d/actions?query=branch%3Amaster)
+
 # bin_packer_3d
 <!-- "short sentence explaining what it is"] -->
 
@@ -19,11 +21,11 @@ strategy, which some rotational optimizations.
     use bin_packer_3d::item::Item;
     use bin_packer_3d::packing_algorithm::packing_algorithm;
 
-    let deck = Item::new("deck", [2.0, 8.0, 12.0]);
-    let die = Item::new("die", [8.0, 8.0, 8.0]);
+    let deck = Item::new("deck", [2, 8, 12]);
+    let die = Item::new("die", [8, 8, 8]);
     let items = vec![deck.clone(), deck.clone(), die, deck.clone(), deck];
 
-    let packed_items = packing_algorithm(Bin::new([8.0, 8.0, 12.0]), &items);
+    let packed_items = packing_algorithm(Bin::new([8, 8, 12]), &items);
     assert_eq!(packed_items, Ok(vec![vec!["deck", "deck", "deck", "deck"], vec!["die"]]));
 ```
 
