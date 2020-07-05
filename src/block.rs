@@ -31,7 +31,7 @@ pub struct Block {
 }
 
 impl Block {
-    pub fn new<F: Into<f64>>(d1: F, d2: F, d3: F) -> Self {
+    pub fn new<F: Into<Dimension>>(d1: F, d2: F, d3: F) -> Self {
         // TODO: fail on negative values
         let mut dims = [d1.into(), d2.into(), d3.into()];
         dims.sort_by(|a, b| a.partial_cmp(b).unwrap_or(Equal));
@@ -63,13 +63,13 @@ impl Block {
     If an item doesn't fit, we return None.
 
     /// ```rust
-    ///   let item = Block::new(1 as Dimension, 1 as Dimension, 1 as Dimension);
-    ///   let container = Block::new(1 as Dimension, 2 as Dimension, 2 as Dimension);
+    ///   let item = Block::new(1, 1, 1);
+    ///   let container = Block::new(1, 2, 2);
     ///   assert_eq!(
     ///       container.best_fit(&item),
     ///       Some(vec![
-    ///           Block::new(1 as Dimension, 1 as Dimension, 1 as Dimension),
-    ///           Block::new(1 as Dimension, 1 as Dimension, 2 as Dimension)
+    ///           Block::new(1, 1, 1),
+    ///           Block::new(1, 1, 2)
     ///       ])
     ///   );
     /// ```
