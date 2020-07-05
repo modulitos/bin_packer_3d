@@ -1,11 +1,12 @@
 use crate::block::BestFitKind::{DoubledFit, ExactFit, GreaterThanFit};
+use crate::error::{ Result};
 use std::cmp::Ordering::Equal;
 
 // TODO: explore using a fixed-decimal type. (eg: u16 for the integer, and u8 for the two decmial
 // places)
 
-pub type Dimension = f32;
-type Volume = f32;
+pub type Dimension = f64;
+type Volume = f64;
 
 /// Represents the kinds of fits we support in the best-fit section of our algorithm.
 /// usize contains the index of the dim where the best-fit has been matched.
@@ -30,8 +31,9 @@ pub struct Block {
 }
 
 impl Block {
-    pub fn new(d1: Dimension, d2: Dimension, d3: Dimension) -> Self {
-        let mut dims = [d1, d2, d3];
+    pub fn new<F: Into<f64>>(d1: F, d2: F, d3: F) -> Self {
+        // TODO: fail on negative values
+        let mut dims = [d1.into(), d2.into(), d3.into()];
         dims.sort_by(|a, b| a.partial_cmp(b).unwrap_or(Equal));
         Self { dims }
     }

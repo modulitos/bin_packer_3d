@@ -23,7 +23,7 @@ pub struct Item<'a> {
 
 impl<'a> Item<'a> {
     /// Create an item given it's id and dimensions.
-    pub fn new(id: &'a str, dims: [Dimension; 3]) -> Self {
+    pub fn new<F: Into<Dimension> + Copy>(id: &'a str, dims: [F; 3]) -> Self {
         Self {
             id,
             block: Block::new(dims[0], dims[1], dims[2]),

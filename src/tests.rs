@@ -1,20 +1,20 @@
-use crate::block::{Block, Dimension};
-use crate::item::Item;
 use crate::bin::Bin;
+use crate::block::{Block, Dimension};
 use crate::error::Result;
+use crate::item::Item;
 
 mod block {
     use super::*;
 
     #[test]
     fn test_block_creation() -> Result<()> {
-        Block::new(1 as Dimension, 2 as Dimension, 3 as Dimension);
+        Block::new(1, 2, 3);
         Ok(())
     }
 
     #[test]
     fn test_item_creation() -> Result<()> {
-        Item::new("asdf", [1 as Dimension, 2 as Dimension, 3 as Dimension]);
+        Item::new("asdf", [1, 2, 3]);
         Ok(())
     }
 
@@ -41,7 +41,7 @@ mod block {
     #[test]
     fn test_block_does_it_fit() -> Result<()> {
         // test that when an item fits, it returns true
-        let item = Block::new(3.5, 14 as Dimension, 12.7);
+        let item = Block::new(3.5, 14.0, 12.7);
         let container = Block::new(4 as Dimension, 22 as Dimension, 14 as Dimension);
         assert!(container.does_it_fit(&item));
         Ok(())
@@ -99,14 +99,14 @@ mod block {
     fn test_best_fit_first_fit_greater_than() -> Result<()> {
         // test that the "greater than" match clause of the first fit returns the
         // correct remaining space.
-        let item = Block::new(1.25, 7 as Dimension, 10 as Dimension);
+        let item = Block::new(1.25, 7.0, 10.0);
         let container = Block::new(3.5, 9.5, 12.5);
         assert_eq!(
             container.best_fit(&item),
             Some(vec![
-                Block::new(1.25, 2.5, 7 as Dimension),
+                Block::new(1.25, 2.5, 7.0),
                 Block::new(2.5, 3.5, 12.5),
-                Block::new(2.25, 7 as Dimension, 12.5)
+                Block::new(2.25, 7.0, 12.5)
             ])
         );
         Ok(())

@@ -1,5 +1,5 @@
 use crate::block::{Block, Dimension};
-use crate::error::{Error, Result};
+use crate::error::Result;
 use crate::item::Item;
 
 /// Represents an bin that a user can insert items into.
@@ -18,7 +18,7 @@ pub struct Bin<'a> {
 
 impl<'a> Bin<'a> {
     /// Creates a new Bin from it's dimensions.
-    pub fn new(dims: [Dimension; 3]) -> Self {
+    pub fn new<F: Into<Dimension> + Copy>(dims: [F; 3]) -> Self {
         Self {
             blocks: vec![Block::new(dims[0], dims[1], dims[2])],
             items: vec![],
