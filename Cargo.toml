@@ -1,6 +1,6 @@
 [package]
 name = "bin_packer_3d"
-version = "0.1.2"
+version = "1.0.0"
 authors = ["modulitos <modulitos@users.noreply.github.com>"]
 edition = "2018"
 repository = "https://github.com/modulitos/bin_packer_3d"
