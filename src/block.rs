@@ -24,7 +24,7 @@ enum BestFitKind {
 
 /// Represents a 3-dimensional cuboid.
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Block {
     /// The dimensions, sorted in ascending order.
     pub dims: [Dimension; 3],

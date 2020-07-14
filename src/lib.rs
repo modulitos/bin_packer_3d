@@ -29,7 +29,7 @@ strategy, which some rotational optimizations.
 
     let deck = Item::new("deck", [2, 8, 12]);
     let die = Item::new("die", [8, 8, 8]);
-    let items = vec![deck.clone(), deck.clone(), die, deck.clone(), deck];
+    let items = vec![deck, deck, die, deck, deck];
 
     let packed_items = packing_algorithm(Bin::new([8, 8, 12]), &items);
     assert_eq!(packed_items, Ok(vec![vec!["deck", "deck", "deck", "deck"], vec!["die"]]));

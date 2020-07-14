@@ -3,7 +3,6 @@ use bin_packer_3d::error::{Error, Result};
 use bin_packer_3d::item::{Item, ItemId};
 use bin_packer_3d::packing_algorithm::packing_algorithm;
 
-
 /// test packing_algorithm API
 
 #[test]
@@ -37,7 +36,7 @@ fn test_pack_items_one_item() -> Result<()> {
 fn test_pack_items_two_item_exact() -> Result<()> {
     let bin = Bin::new([13, 26, 31]);
     let item_1 = Item::new("item1", [13, 13, 31]);
-    let items = vec![item_1.clone(), item_1];
+    let items = vec![item_1, item_1];
     let res = packing_algorithm(bin, &items)?;
     assert_eq!(res, vec![vec!["item1", "item1"]]);
     Ok(())
@@ -46,7 +45,7 @@ fn test_pack_items_two_item_exact() -> Result<()> {
 #[test]
 fn test_two_items_two_bins() -> Result<()> {
     let item = Item::new("item1", [13, 13, 31]);
-    let items = vec![item.clone(), item];
+    let items = vec![item, item];
     let res = packing_algorithm(Bin::new([13, 13, 31]), &items)?;
     assert_eq!(res, vec![vec!["item1"], vec!["item1"]]);
     Ok(())
@@ -77,7 +76,7 @@ fn test_odd_sizes() -> Result<()> {
     let item_1 = Item::new("item1", [3, 8, 10]);
     let item_2 = Item::new("item2", [1, 2, 5]);
     let item_3 = Item::new("item3", [1, 2, 2]);
-    let items = vec![item_1, item_2.clone(), item_2, item_3];
+    let items = vec![item_1, item_2, item_2, item_3];
     let res = packing_algorithm(Bin::new([10, 20, 20]), &items)?;
     assert_eq!(res, vec![vec!["item1", "item2", "item2", "item3"]]);
     Ok(())
@@ -89,7 +88,7 @@ fn test_odd_sizes_unordered() -> Result<()> {
     let item_1 = Item::new("item1", [3, 8, 10]);
     let item_2 = Item::new("item2", [1, 2, 5]);
     let item_3 = Item::new("item3", [1, 2, 2]);
-    let items = vec![item_3, item_2.clone(), item_1, item_2];
+    let items = vec![item_3, item_2, item_1, item_2];
     let res = packing_algorithm(Bin::new([10, 20, 20]), &items)?;
     assert_eq!(res, vec![vec!["item1", "item2", "item2", "item3"]]);
     Ok(())
@@ -98,7 +97,7 @@ fn test_odd_sizes_unordered() -> Result<()> {
 #[test]
 fn test_slightly_larger_bin() -> Result<()> {
     let item = Item::new("item1", [4, 4, 12]);
-    let items = vec![item.clone(), item];
+    let items = vec![item, item];
     // let res = packing_algorithm(Bin::new([5, 8, 12]), &items)?;
     let res = packing_algorithm(Bin::new([4, 8, 12]), &items)?;
     assert_eq!(res, vec![vec!["item1", "item1"]]);
@@ -108,7 +107,7 @@ fn test_slightly_larger_bin() -> Result<()> {
 #[test]
 fn test_pack_3_bins() -> Result<()> {
     let item = Item::new("item1", [4, 4, 12]);
-    let items = vec![item.clone(), item.clone(), item];
+    let items = vec![item, item, item];
     let res = packing_algorithm(Bin::new([4, 4, 12]), &items)?;
     assert_eq!(res, vec![vec!["item1"], vec!["item1"], vec!["item1"]]);
     Ok(())
@@ -119,7 +118,7 @@ fn test_dim_over_2() -> Result<()> {
     // test that when length of item <= length of bin / 2 it packs along longer # edge
 
     let item = Item::new("item1", [3, 4, 5]);
-    let items = (0..=3).map(|_| item.clone()).collect();
+    let items = (0..=3).map(|_| item).collect();
     let res = packing_algorithm(Bin::new([6, 8, 10]), &items)?;
     assert_eq!(res, vec![["item1"; 4].to_vec()]);
     Ok(())
@@ -166,7 +165,7 @@ fn test_100_items_inexact_fit_2_bins() -> Result<()> {
 fn test_big_die_and_serveral_decks_of_cards() -> Result<()> {
     let deck = Item::new("deck", [2, 8, 12]);
     let die = Item::new("die", [8, 8, 8]);
-    let items = vec![deck.clone(), deck.clone(), die, deck.clone(), deck];
+    let items = vec![deck, deck, die, deck, deck];
     let res = packing_algorithm(Bin::new([8, 8, 12]), &items)?;
     assert_eq!(res.len(), 2);
     assert_eq!(res, vec![["deck"; 4].to_vec(), vec!["die"]]);
@@ -201,7 +200,7 @@ fn test_tight_fit_many_oblong_inexact() -> Result<()> {
 #[test]
 fn test_flat_bin() -> Result<()> {
     let item_1 = Item::new("item1", [1.25, 7.0, 10.0]);
-    let items = vec![item_1.clone(), item_1.clone(), item_1];
+    let items = vec![item_1, item_1, item_1];
     let res = packing_algorithm(Bin::new([3.5, 9.5, 12.5]), &items)?;
     assert_eq!(res.len(), 2);
     assert_eq!(res.first().map(|packed| packed.len()), Some(2));
