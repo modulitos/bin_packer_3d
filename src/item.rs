@@ -13,7 +13,7 @@ pub type ItemId = str;
 ///   use bin_packer_3d::item::Item;
 ///   let item = Item::new("deck", [2.0, 8.0, 12.0]);
 /// ```
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Copy)]
 pub struct Item<'a> {
     /// a string slice of the id
     pub id: &'a ItemId,
