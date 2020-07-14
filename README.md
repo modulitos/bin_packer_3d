@@ -1,6 +1,7 @@
 [<img alt="build status" src="https://img.shields.io/github/workflow/status/modulitos/bin_packer_3d/CI/master?style=for-the-badge" height="20">](https://github.com/modulitos/bin_packer_3d/actions?query=branch%3Amaster)
 
 # bin_packer_3d
+
 <!-- "short sentence explaining what it is"] -->
 
 This crate solves the problem of "fitting smaller boxes inside of a larger box" using a three
@@ -8,9 +9,9 @@ dimensional fitting algorithm.
 
 <!-- [more detailed explanation] -->
 
-The algorithm leverages a [First Fit
+The algorithm orthogonally packs the all the items into a minimum number of bins by leveraging a [First Fit
 Decreasing](https://en.wikipedia.org/wiki/Bin_packing_problem#First_Fit_Decreasing_(FFD)) greedy
-strategy, which some rotational optimizations.
+strategy, along with rotational optimizations.
 
 <!-- [at least one code example that users can copy/paste to try it] -->
 
@@ -23,7 +24,7 @@ strategy, which some rotational optimizations.
 
     let deck = Item::new("deck", [2, 8, 12]);
     let die = Item::new("die", [8, 8, 8]);
-    let items = vec![deck.clone(), deck.clone(), die, deck.clone(), deck];
+    let items = vec![deck, deck, die, deck, deck];
 
     let packed_items = packing_algorithm(Bin::new([8, 8, 12]), &items);
     assert_eq!(packed_items, Ok(vec![vec!["deck", "deck", "deck", "deck"], vec!["die"]]));
@@ -36,13 +37,18 @@ strategy, which some rotational optimizations.
 This algorithm solves a constrained version of the 3D bin packing problem. As such, we have the
 following limitations:
 
- * The items we are packing, and the bins that we are packing them into, are limited to cuboid shapes
+ * The items we are packing, and the bins that we are packing them into, are limited to cuboid
+   shapes.
 
- * As an NP-Hard problem, this algorithm does not attempt to find the optimal solution
+ * The items we are packing can be rotated in any direction, with the limitation that each edge must
+   be parallel to the corresponding bin edge.
+
+ * As an NP-Hard problem, this algorithm does not attempt to find the optimal solution, but instead
+   uses an approximation that runs with a time complexity of *O(n^2)*
 
 # Acknowledgements:
 
 The algorithm leverages a rotational optimization when packing items which are less than half the
 length of a bin's side, as proposed in the paper titled "The Three-Dimensional Bin Packing Problem"
-(Martello, 1997):
-[https://www.jstor.org/stable/pdf/223143.pdf](https://www.jstor.org/stable/pdf/223143.pdf), page 257
+(Martello, 1997), page 257:
+[https://www.jstor.org/stable/pdf/223143.pdf](https://www.jstor.org/stable/pdf/223143.pdf)
