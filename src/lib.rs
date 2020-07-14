@@ -14,9 +14,9 @@ dimensional fitting algorithm.
 
 <!-- [more detailed explanation] -->
 
-The algorithm leverages a [First Fit
+The algorithm orthogonally packs the all the items into a minimum number of bins by leveraging a [First Fit
 Decreasing](https://en.wikipedia.org/wiki/Bin_packing_problem#First_Fit_Decreasing_(FFD)) greedy
-strategy, which some rotational optimizations.
+strategy, along with rotational optimizations.
 
 <!-- [at least one code example that users can copy/paste to try it] -->
 
@@ -42,16 +42,21 @@ strategy, which some rotational optimizations.
 This algorithm solves a constrained version of the 3D bin packing problem. As such, we have the
 following limitations:
 
- * The items we are packing, and the bins that we are packing them into, are limited to cuboid shapes
+ * The items we are packing, and the bins that we are packing them into, are limited to cuboid
+   shapes.
 
- * As an NP-Hard problem, this algorithm does not attempt to find the optimal solution
+ * The items we are packing can be rotated in any direction, with the limitation that each edge must
+   be parallel to the corresponding bin edge.
+
+ * As an NP-Hard problem, this algorithm does not attempt to find the optimal solution, but instead
+   uses an approximation that runs with a time complexity of *O(n^2)*
 
 # Acknowledgements:
 
 The algorithm leverages a rotational optimization when packing items which are less than half the
 length of a bin's side, as proposed in the paper titled "The Three-Dimensional Bin Packing Problem"
-(Martello, 1997):
-[https://www.jstor.org/stable/pdf/223143.pdf](https://www.jstor.org/stable/pdf/223143.pdf), page 257
+(Martello, 1997), page 257:
+[https://www.jstor.org/stable/pdf/223143.pdf](https://www.jstor.org/stable/pdf/223143.pdf)
 
 */
 
