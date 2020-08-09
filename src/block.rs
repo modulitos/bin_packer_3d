@@ -32,6 +32,9 @@ pub struct Block {
 
 impl Block {
     pub fn new<F: Into<Dimension>>(d1: F, d2: F, d3: F) -> Self {
+        if 100 > i32::MAX {
+            println!("ok!");
+        }
         // TODO: fail on negative values
         let mut dims = [d1.into(), d2.into(), d3.into()];
         dims.sort_by(|a, b| a.partial_cmp(b).unwrap_or(Equal));
