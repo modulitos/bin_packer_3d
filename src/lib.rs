@@ -1,5 +1,6 @@
 #![warn(
     missing_debug_implementations,
+    clippy::all,
     rust_2018_idioms,
     missing_docs,
     missing_doc_code_examples
