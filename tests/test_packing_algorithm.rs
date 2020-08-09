@@ -55,7 +55,7 @@ fn test_two_items_two_bins() -> Result<()> {
 fn test_three_items_one_bin() -> Result<()> {
     let item_1 = Item::new("item1", [13, 13, 31]);
     let item_2 = Item::new("item2", [8, 13, 31]);
-    let item_3 = Item::new("item3", [5, 13, 32]);
+    let item_3 = Item::new("item3", [5, 13, 31]);
     let items = vec![item_1, item_2, item_3];
     let res = packing_algorithm(Bin::new([13, 26, 31]), &items)?;
     assert_eq!(res, vec![vec!["item1", "item2", "item3"]]);
