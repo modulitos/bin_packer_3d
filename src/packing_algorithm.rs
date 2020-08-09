@@ -28,7 +28,7 @@ bins. (first bin is first nested list, second is the second, etc.)
 
 pub fn packing_algorithm<'a>(
     bin: Bin<'a>,
-    items: &'a Vec<Item<'_>>,
+    items: &[Item<'a>],
 ) -> Result<Vec<Vec<&'a ItemId>>> {
     if !items.iter().all(|item| bin.fits(item)) {
         return Err(Error::AllItemsMustFit(format!(
@@ -36,7 +36,7 @@ pub fn packing_algorithm<'a>(
         )));
     }
 
-    let mut items_to_pack = items.clone();
+    let mut items_to_pack = items.to_owned();
 
     // Sort the items in descending order, where order is based on the longest dimension:
 

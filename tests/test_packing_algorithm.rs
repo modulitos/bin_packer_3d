@@ -65,7 +65,7 @@ fn test_three_items_one_bin() -> Result<()> {
 #[test]
 fn test_one_overflow() -> Result<()> {
     let item = Item::new("item1", [1, 1, 1]);
-    let items = (0..=27).map(|_| item.clone()).collect();
+    let items = [item; 28];
     let res = packing_algorithm(Bin::new([3, 3, 3]), &items)?;
     assert_eq!(res, vec![["item1"; 27].to_vec(), vec!["item1"]]);
     Ok(())
@@ -118,7 +118,7 @@ fn test_dim_over_2() -> Result<()> {
     // test that when length of item <= length of bin / 2 it packs along longer # edge
 
     let item = Item::new("item1", [3, 4, 5]);
-    let items = (0..=3).map(|_| item).collect();
+    let items = [item; 4];
     let res = packing_algorithm(Bin::new([6, 8, 10]), &items)?;
     assert_eq!(res, vec![["item1"; 4].to_vec()]);
     Ok(())
@@ -142,7 +142,7 @@ fn test_100_items_inexact_fit() -> Result<()> {
     // test many items into one bin with inexact fit
 
     let item = Item::new("item1", [5, 5, 5]);
-    let items = (0..100).map(|_| item.clone()).collect();
+    let items = [item; 100];
     let res = packing_algorithm(Bin::new([51, 51, 6]), &items)?;
     assert_eq!(res.len(), 1);
     Ok(())
@@ -153,7 +153,7 @@ fn test_100_items_inexact_fit_2_bins() -> Result<()> {
     // test many items separated into 2 bins with exact fit
 
     let item = Item::new("item1", [5, 5, 5]);
-    let items = (0..100).map(|_| item.clone()).collect();
+    let items = [item; 100];
     let res = packing_algorithm(Bin::new([25, 10, 25]), &items)?;
     assert_eq!(res.len(), 2);
     assert_eq!(res.first().map(|packed| packed.len()), Some(50));
@@ -176,8 +176,8 @@ fn test_big_die_and_serveral_decks_of_cards() -> Result<()> {
 fn test_tight_fit_many_oblong() -> Result<()> {
     // tests a tight fit for non-cubic items
 
-    let item_1 = Item::new("item1", [1, 2, 3]);
-    let items = (0..107).map(|_| item_1.clone()).collect();
+    let item = Item::new("item1", [1, 2, 3]);
+    let items = [item; 107];
     let res = packing_algorithm(Bin::new([8, 9, 9]), &items)?;
     assert_eq!(res.len(), 2);
     assert_eq!(res, vec![["item1"; 106].to_vec(), vec!["item1"]]);
@@ -188,9 +188,8 @@ fn test_tight_fit_many_oblong() -> Result<()> {
 fn test_tight_fit_many_oblong_inexact() -> Result<()> {
     // tests that the algorithm remains at least as accurate as it already is. If it were perfect,
     // the first bin would have 48 in it
-
-    let item_1 = Item::new("item1", [1, 2, 3]);
-    let items = (0..49).map(|_| item_1.clone()).collect();
+    let item = Item::new("item1", [1, 2, 3]);
+    let items = [item; 49];
     let res = packing_algorithm(Bin::new([4, 8, 9]), &items)?;
     assert_eq!(res.len(), 2);
     assert!(res.first().map(|packed| packed.len()) >= Some(44));

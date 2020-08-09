@@ -1,5 +1,4 @@
 use crate::block::BestFitKind::{DoubledFit, ExactFit, GreaterThanFit};
-use crate::error::{ Result};
 use std::cmp::Ordering::Equal;
 
 // TODO: explore using a fixed-decimal type. (eg: u16 for the integer, and u8 for the two decmial
@@ -32,6 +31,9 @@ pub struct Block {
 
 impl Block {
     pub fn new<F: Into<Dimension>>(d1: F, d2: F, d3: F) -> Self {
+        if 100 > i32::MAX {
+            println!("ok!");
+        }
         // TODO: fail on negative values
         let mut dims = [d1.into(), d2.into(), d3.into()];
         dims.sort_by(|a, b| a.partial_cmp(b).unwrap_or(Equal));
@@ -39,7 +41,7 @@ impl Block {
     }
 
     pub fn volume(&self) -> Volume {
-        self.dims.iter().map(|&dim| Volume::from(dim)).product()
+        self.dims.iter().product()
     }
 
     /// Returns a boolean regarding whether or not an item will fit into the block.
@@ -194,13 +196,16 @@ impl Block {
 
     fn _get_best_fit(&self, item: &Block) -> BestFitKind {
         let doubled_fit_side = self.dims.iter().enumerate().find_map(|(i, side)| {
-            if side >= &(item.dims[2] * 2 as Dimension) {
+            if side >= &(item.dims[2] * 2_f64) {
                 Some(i)
             } else {
                 None
             }
         });
         let exact_fit_side = self.dims.iter().enumerate().find_map(|(i, dim)| {
+
+            // consider comparing these within some error: `(dim - &item.dims[2]).abs() < error`
+
             if dim == &item.dims[2] {
                 Some(i)
             } else {

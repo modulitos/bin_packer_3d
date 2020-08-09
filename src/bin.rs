@@ -1,5 +1,4 @@
 use crate::block::{Block, Dimension};
-use crate::error::Result;
 use crate::item::Item;
 
 /// Represents an bin that a user can insert items into.
