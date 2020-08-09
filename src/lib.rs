@@ -1,10 +1,16 @@
 #![warn(
     missing_debug_implementations,
-    clippy::all,
     rust_2018_idioms,
     missing_docs,
     missing_doc_code_examples
 )]
+
+#![deny(
+    clippy::all
+)]
+// To use the `unsafe` keyword, change to `#![allow(unsafe_code)]` (do not remove); aids auditing.
+
+#![forbid(unsafe_code)]
 
 /*!
 
