@@ -16,20 +16,24 @@ bins. (first bin is first nested list, second is the second, etc.)
   use bin_packer_3d::bin::Bin;
   use bin_packer_3d::item::Item;
   use bin_packer_3d::packing_algorithm::packing_algorithm;
+  # use bin_packer_3d::error::Result;
+  # fn main() -> Result<()> {
 
   let deck = Item::new("deck", [2.0, 8.0, 12.0]);
   let die = Item::new("die", [8.0, 8.0, 8.0]);
   let items = vec![deck.clone(), deck.clone(), die, deck.clone(), deck];
 
-  let packed_items = packing_algorithm(Bin::new([8.0, 8.0, 12.0]), &items);
-  assert_eq!(packed_items, Ok(vec![vec!["deck", "deck", "deck", "deck"], vec!["die"]]));
+  let packed_items = packing_algorithm(Bin::new([8.0, 8.0, 12.0]), &items).unwrap();
+  assert_eq!(packed_items, vec![vec!["deck", "deck", "deck", "deck"], vec!["die"]]);
+  # Ok(())
+  # }
 ```
 **/
 
-pub fn packing_algorithm<'a>(
-    bin: Bin<'a>,
-    items: &[Item<'a>],
-) -> Result<Vec<Vec<&'a ItemId>>> {
+pub fn packing_algorithm(
+    bin: Bin,
+    items: &[Item],
+) -> Result<Vec<Vec<ItemId>>> {
     if !items.iter().all(|item| bin.fits(item)) {
         return Err(Error::AllItemsMustFit(format!(
             "All items must fit within the bin dimensions."
@@ -42,7 +46,7 @@ pub fn packing_algorithm<'a>(
 
     items_to_pack.sort_by(|a, b| b.cmp(&a));
 
-    let mut packed_bins: Vec<Bin<'a>> = Vec::new();
+    let mut packed_bins: Vec<Bin> = Vec::new();
     let mut bin_currently_packing = bin.clone_as_empty_bin();
 
     loop {

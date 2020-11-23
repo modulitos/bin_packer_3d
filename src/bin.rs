@@ -8,14 +8,14 @@ use crate::item::Item;
 /// ```
 
 #[derive(Clone, Debug)]
-pub struct Bin<'a> {
+pub struct Bin {
     /// Represents the cuboid of this bin.
     blocks: Vec<Block>,
     /// Represents the items that are currently packed inside this bin.
-    pub items: Vec<Item<'a>>,
+    pub items: Vec<Item>,
 }
 
-impl<'a> Bin<'a> {
+impl Bin {
     /// Creates a new Bin from it's dimensions.
     pub fn new<F: Into<Dimension> + Copy>(dims: [F; 3]) -> Self {
         Self {
@@ -44,7 +44,7 @@ impl<'a> Bin<'a> {
         assert!(!bin.fits(&item));
     ```
     **/
-    pub fn fits(&self, item: &Item<'_>) -> bool {
+    pub fn fits(&self, item: &Item) -> bool {
         self.blocks
             .iter()
             .any(|block| block.does_it_fit(&item.block))
@@ -69,12 +69,12 @@ impl<'a> Bin<'a> {
             bin.items
                 .into_iter()
                 .map(|item| item.id)
-                .collect::<Vec<&ItemId>>(),
+                .collect::<Vec<ItemId>>(),
             vec!["item1", "item2"]
         );
     ```
     **/
-    pub fn try_packing(&mut self, item: Item<'a>) -> Option<()> {
+    pub fn try_packing(&mut self, item: Item) -> Option<()> {
         let block_to_pack_index =
             self.blocks
                 .iter()
