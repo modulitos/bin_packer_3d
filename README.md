@@ -52,3 +52,8 @@ The algorithm leverages a rotational optimization when packing items which are l
 length of a bin's side, as proposed in the paper titled "The Three-Dimensional Bin Packing Problem"
 (Martello, 1997), page 257:
 [https://www.jstor.org/stable/pdf/223143.pdf](https://www.jstor.org/stable/pdf/223143.pdf)
+
+Inspired by this implementation by Shotput:
+https://github.com/shotput/BoxPackingAPI/commit/48cfbd9c7b82c6f7640386523627d7911ff9089b
+https://medium.com/the-chain/solving-the-box-selection-algorithm-8695df087a4
+https://medium.com/the-chain/efficiency-of-the-shotput-packing-algorithm-a690e914d49c
