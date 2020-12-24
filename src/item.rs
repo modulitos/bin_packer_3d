@@ -6,26 +6,26 @@ use std::cmp::Ordering::Equal;
 ///
 /// Although it's not enforced, it's highly recommended that each item has a unique ItemId.
 ///
-pub type ItemId = str;
+pub type ItemId = String;
 
 /// Represents an item that a user will insert into a bin.
 /// ```rust
 ///   use bin_packer_3d::item::Item;
 ///   let item = Item::new("deck", [2.0, 8.0, 12.0]);
 /// ```
-#[derive(Clone, Debug, Copy)]
-pub struct Item<'a> {
+#[derive(Clone, Debug)]
+pub struct Item {
     /// a string slice of the id
-    pub id: &'a ItemId,
+    pub id: ItemId,
     /// a Block
     pub block: Block,
 }
 
-impl<'a> Item<'a> {
+impl Item {
     /// Create an item given it's id and dimensions.
-    pub fn new<F: Into<Dimension> + Copy>(id: &'a str, dims: [F; 3]) -> Self {
+    pub fn new<F: Into<Dimension> + Copy>(id: &str, dims: [F; 3]) -> Self {
         Self {
-            id,
+            id: id.into(),
             block: Block::new(dims[0], dims[1], dims[2]),
         }
     }
@@ -35,7 +35,7 @@ impl<'a> Item<'a> {
     }
 }
 
-impl Ord for Item<'_> {
+impl Ord for Item {
     fn cmp(&self, other: &Self) -> Ordering {
         self.get_largest_dim()
             .partial_cmp(&other.get_largest_dim())
@@ -43,16 +43,16 @@ impl Ord for Item<'_> {
     }
 }
 
-impl PartialOrd for Item<'_> {
+impl PartialOrd for Item {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(&other))
     }
 }
 
-impl PartialEq for Item<'_> {
+impl PartialEq for Item {
     fn eq(&self, other: &Self) -> bool {
         self.id == other.id
     }
 }
 
-impl<'a> Eq for Item<'a> {}
+impl Eq for Item {}
